@@ -1,63 +1,109 @@
-const dropContainer = document.getElementById('dropContainer');
+const dropZone = document.getElementById('dropZone');
 const dropMessage = document.getElementById('dropMessage');
+const filePreviews = document.getElementById('filePreviews');
 const fileInput = document.getElementById('fileInput');
+const compressButton = document.getElementById('compressButton');
 const uploadButton = document.getElementById('uploadButton');
+let filesToUpload = [];
 
-dropContainer.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  dropContainer.classList.add('highlight');
+fileInput.addEventListener('change', () => {
+  handleFiles(fileInput.files);
 });
 
-dropContainer.addEventListener('dragleave', () => {
-  dropContainer.classList.remove('highlight');
+dropZone.addEventListener('dragover', (e) => {
+  e.stopPropagation();
+  e.preventDefault();
+  dropZone.classList.add('highlight');
 });
 
-dropContainer.addEventListener('drop', (e) => {
-  e.preventDefault();
-  dropContainer.classList.remove('highlight');
+dropZone.addEventListener('dragleave', () => {
+  dropZone.classList.remove('highlight');
+});
 
+dropZone.addEventListener('drop', (e) => {
+  e.stopPropagation();
+  e.preventDefault();
+  dropZone.classList.remove('highlight');
   const files = e.dataTransfer.files;
   handleFiles(files);
 });
 
-fileInput.addEventListener('change', () => {
-  const files = fileInput.files;
-  handleFiles(files);
-});
-
-uploadButton.addEventListener('click', () => {
-  const files = fileInput.files;
-  uploadFiles(files);
-});
-
+// Function to handle file upload
 function handleFiles(files) {
+  filePreviews.innerHTML = '';
+  filesToUpload = [];
   Array.from(files).forEach((file) => {
-    const fileItem = document.createElement('div');
-    fileItem.classList.add('file-item');
-    fileItem.textContent = file.name;
-    dropContainer.appendChild(fileItem);
-  });
-}
+    if (file.name.toLowerCase().endsWith('.pdf')) {
+      filesToUpload.push(file);
+      const reader = new FileReader();
+      // Create file preview for each file uploaded
+      reader.onload = (e) => {
+        const preview = document.createElement('div');
+        preview.classList.add('file-preview');
 
-function uploadFiles(files) {
-  const formData = new FormData();
-  Array.from(files).forEach((file) => {
-    formData.append('files', file);
-  });
+        const img = document.createElement('img');
+        img.src = e.target.result;
 
-  fetch('http://localhost:3000/api/uploads', {
-    method: 'POST',
-    body: formData,
-  })
-    .then((response) => {
-      if (response.ok) {
-        alert('Files uploaded successfully!');
+        const desc = document.createElement('div');
+        desc.classList.add('file-name');
+        desc.innerText = `${file.name}`;
+
+        const delBttn = document.createElement('button');
+        delBttn.classList.add('delete-button');
+        delBttn.innerText = 'Delete';
+        delBttn.addEventListener('click', (e) => {
+          const indexToRemove = Array.from(filePreviews.children).indexOf(
+            e.target.parentNode
+          );
+          filesToUpload.splice(indexToRemove, 1);
+          console.log(filesToUpload);
+          preview.remove();
+          fileInput.value = '';
+          if (filesToUpload.length !== 0) {
+            uploadButton.style.display = 'none';
+          } else {
+            uploadButton.style.display = 'initial';
+          }
+        });
+
+        preview.appendChild(img);
+        preview.appendChild(desc);
+        preview.appendChild(delBttn);
+
+        filePreviews.appendChild(preview);
+      };
+      reader.readAsDataURL(file);
+      if (filesToUpload.length !== 0) {
+        uploadButton.style.display = 'none';
       } else {
-        alert('Error uploading files.');
+        uploadButton.style.display = 'initial';
       }
-    })
-    .catch((error) => {
-      console.error('Error uploading files:', error);
-      alert('Error uploading files.');
-    });
+    } else {
+      alert('Please upload only PDF files.');
+      fileInput.value = '';
+    }
+  });
 }
+
+// function compressFiles(files) {
+//   const formData = new FormData();
+//   Array.from(files).forEach((file) => {
+//     formData.append('files', file);
+//   });
+
+//   fetch('http://localhost:3000/api/uploads', {
+//     method: 'POST',
+//     body: formData,
+//   })
+//     .then((response) => {
+//       if (response.ok) {
+//         alert('Files uploaded successfully!');
+//       } else {
+//         alert('Error uploading files.');
+//       }
+//     })
+//     .catch((error) => {
+//       console.error('Error uploading files:', error);
+//       alert('Error uploading files.');
+//     });
+// }

@@ -23,10 +23,10 @@ body {
   border: 1px dashed red;
 }
 .faded-bg {
-  background-color: rgba(253, 149, 149, 0.5);
+  background-color: rgba(255, 163, 163, 0.5);
 }
 .centered {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -40,6 +40,13 @@ body {
   display: flex;
   flex-direction: row;
 }
+.flex-vertical {
+  display: flex;
+  flex-direction: column;
+}
+.flex-spread {
+  justify-content: space-between;
+}
 .columns {
   column-count: 6;
   column-rule: 1px solid #ccc;
@@ -48,6 +55,7 @@ body {
 .gallery {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  grid-gap: 1em;
 }
 
 .card {
@@ -87,6 +95,46 @@ body {
 }
 .slide-button input {
   display: none;
+}
+
+input {
+  background: rgba(0, 255, 213, 0.541);
+}
+
+#fileInput {
+  display: none;
+}
+
+.highlight {
+  background-color: rgba(255, 217, 0, 0.5);
+}
+
+/* .file-previews {
+  display: flex;
+  flex-wrap: wrap;
+} */
+
+.file-preview {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  width: 200px;
+  text-align: center;
+}
+
+.file-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.file-preview img {
+  max-width: 100%;
+  height: auto;
+}
+
+#uploadButton {
+  width: fit-content;
+  background-color: aqua;
 }
 /* body {
   display: flex;

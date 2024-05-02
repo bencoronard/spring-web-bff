@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF24 | Compress PDF</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <!-- <header>
+      <div class="faded-bg">
+        <div class="centered flex-horizontal">
+          <span class="logo">PDF24 <span>Tools</span></span>
+
+          <div class="wrapper">
+            <a href="#">Desktop Version</a>
+            <a href="#">Contact</a>
+            <a href="#">All PDF Tools</a>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="centered flex-horizontal">
+          <span>Reviews</span>
+        </div>
+      </div>
+    </header> -->
+
+    <main>
+      <section id="compressPDF">
+        <div class="centered">
+          <h1>Compress PDF</h1>
+          <p>
+            PDF compressor to reduce the size of PDF files quickly and easily
+          </p>
+
+          <!-- Drag and drop -->
+          <div id="dropZone" class="this faded-bg filleted flex-vertical">
+            <div class="flex-horizontal flex-spread">
+              <span> 1. Upload your PDFs </span>
+              <span> 2. Choose compression </span>
+              <span> 3. Done </span>
+            </div>
+
+            <div id="dropMessage"></div>
+
+            <div id="filePreviews" class="flex-horizontal"></div>
+
+            <input id="fileInput" type="file" multiple />
+            <button id="uploadButton">Select files</button>
+
+            <span>or drag and drop file into this area</span>
+          </div>
+          <!--  -->
+
+          <div class="container flex-vertical">
+            <label for="compressionSlider">Level of Compression</label>
+            <div class="wrapper">
+              <span>Small Size</span>
+              <input
+                type="range"
+                id="compressionSlider"
+                min="1"
+                max="10"
+                value="2"
+              />
+              <span>Big Size</span>
+            </div>
+          </div>
+
+          <div id="options" class="faded-bg flex-horizontal">
+            <div class="wrapper">
+              <label for="dpi">DPI</label>
+              <input type="number" id="dpi" value="144" min="72" max="300" />
+            </div>
+
+            <div class="wrapper">
+              <label for="img">Image quality</label>
+              <input type="number" id="img" value="100" min="1" max="100" />
+            </div>
+
+            <div class="wrapper slide-button">
+              <span>Color</span>
+              <input type="checkbox" id="color" />
+              <label for="color"></label>
+              <span>Gray</span>
+            </div>
+          </div>
+
+          <button id="compressButton">Compress</button>
+
+          <div id="advertisement"></div>
+        </div>
+      </section>
+
+      <!-- <section id="Information" class="faded-bg">
+        <div class="centered">
+          <h1>Information</h1>
+          <ul class="flex-horizontal">
+            <li>Windows</li>
+            <li>Linux</li>
+            <li>MAC</li>
+            <li>iPhone</li>
+            <li>Android</li>
+          </ul>
+          <div class="gallery">
+            <div class="card filleted">
+              <h2>How to compress PDF files</h2>
+              <p>
+                Select your PDF files which you would like to compress or drop
+                them into the file box and start the compression. A few seconds
+                later you can download your compressed PDF files.
+              </p>
+            </div>
+            <div class="card filleted">
+              <h2>Adjustable quality</h2>
+              <p>
+                Adjustable quality You can adjust the compression quality so
+                that you can tune the compression algorithm in order to get a
+                perfect result. PDF files with images can be compressed better
+                than PDF files with text only.
+              </p>
+            </div>
+            <div class="card filleted">
+              <h2>Easy to use</h2>
+              <p>
+                Easy to use PDF24 makes it as easy and fast as possible for you
+                to compress your files. You don't need to install any software,
+                you only have to select your files and start the compression.
+              </p>
+            </div>
+            <div class="card filleted">
+              <h2>Runs on your system</h2>
+              <p>
+                The compression tool does not need any special system in order
+                to compress your PDF files. The app is browser based and works
+                under all operating systems.
+              </p>
+            </div>
+            <div class="card filleted">
+              <h2>No installation required</h2>
+              <p>
+                No installation required You do not need to download and install
+                any software. PDF files are compressed in the cloud on our
+                servers. The app does not consume your system resources.
+              </p>
+            </div>
+            <div class="card filleted">
+              <h2>Secure online compression</h2>
+              <p>
+                The compression tool does not keep your files longer than
+                necessary on our server. Your files and results will be deleted
+                from our server after a short period of time.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section> -->
+
+      <!-- <section id="FAQ">
+        <div class="centered">
+          <h1>FAQ</h1>
+        </div>
+      </section> -->
+    </main>
+
+    <!-- <footer>
+      <section id="tools">
+        <div class="centered">
+          <h1>All tools</h1>
+          <ul class="centered columns">
+            <li><a href="#">Merge PDF</a></li>
+            <li><a href="#">Split PDF</a></li>
+            <li><a href="#">Compress PDF</a></li>
+            <li><a href="#">Edit PDF</a></li>
+            <li><a href="#">Sign PDF</a></li>
+            <li><a href="#">PDF Converter</a></li>
+            <li><a href="#">Convert to PDF</a></li>
+            <li><a href="#">Images to PDF</a></li>
+            <li><a href="#">PDF to Images</a></li>
+            <li><a href="#">Extract PDF Images</a></li>
+            <li><a href="#">Protect PDF</a></li>
+            <li><a href="#">Unlock PDF</a></li>
+            <li><a href="#">Rotate PDF pages</a></li>
+            <li><a href="#">Remove PDF pages</a></li>
+            <li><a href="#">Extract PDF pages</a></li>
+            <li><a href="#">Sort PDF pages</a></li>
+            <li><a href="#">Webpages to PDF</a></li>
+            <li><a href="#">Create PDF job application</a></li>
+            <li><a href="#">Create PDF with camera</a></li>
+            <li><a href="#">PDF OCR</a></li>
+            <li><a href="#">Add watermark</a></li>
+            <li><a href="#">Add page numbers</a></li>
+            <li><a href="#">View as PDF</a></li>
+            <li><a href="#">PDF Overlay</a></li>
+            <li><a href="#">Compare PDFs</a></li>
+            <li><a href="#">Web optimize PDF</a></li>
+            <li><a href="#">Annotate PDF</a></li>
+            <li><a href="#">Redact PDF</a></li>
+            <li><a href="#">Create PDF</a></li>
+            <li><a href="#">PDF 24 Creator</a></li>
+            <li><a href="#">PDF Printer</a></li>
+            <li><a href="#">PDF Reader</a></li>
+            <li><a href="#">Create Invoice</a></li>
+            <li><a href="#">Remove PDF metadata</a></li>
+            <li><a href="#">Flatten PDF</a></li>
+            <li><a href="#">Crop PDF</a></li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="navigation">
+        <ul class="centered flex-horizontal flex-spread">
+          <li><a href="#">About us</a></li>
+          <li><a href="#">Help</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Legal Notice</a></li>
+          <li><a href="#">Terms of use</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Privacy Settings</a></li>
+        </ul>
+      </section>
+
+      <section id="copyright" class="faded-bg">
+        <p class="centered txtCentered">
+          &copy; <span id="currentYear">2022</span> MangoByte Ltd. All rights
+          reserved.
+        </p>
+      </section>
+    </footer> -->
+
+    <script src="script.js"></script>
+  </body>
+</html>
