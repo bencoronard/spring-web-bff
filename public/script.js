@@ -30,49 +30,46 @@ dropZone.addEventListener('drop', (e) => {
 
 // Function to handle file upload
 function handleFiles(files) {
-  filePreviews.innerHTML = '';
-  filesToUpload = [];
   Array.from(files).forEach((file) => {
+    const fileExists = filesToUpload.some(
+      (existingFile) => existingFile.name === file.name
+    );
+    if (fileExists) {
+      return;
+    }
+
     if (file.name.toLowerCase().endsWith('.pdf')) {
       filesToUpload.push(file);
-      const reader = new FileReader();
-      // Create file preview for each file uploaded
-      reader.onload = (e) => {
-        const preview = document.createElement('div');
-        preview.classList.add('file-preview');
 
-        const img = document.createElement('img');
-        img.src = e.target.result;
+      const preview = document.createElement('div');
+      preview.classList.add('file-preview');
 
-        const desc = document.createElement('div');
-        desc.classList.add('file-name');
-        desc.innerText = `${file.name}`;
+      const desc = document.createElement('div');
+      desc.classList.add('file-name');
+      desc.innerText = `${file.name}`;
 
-        const delBttn = document.createElement('button');
-        delBttn.classList.add('delete-button');
-        delBttn.innerText = 'Delete';
-        delBttn.addEventListener('click', (e) => {
-          const indexToRemove = Array.from(filePreviews.children).indexOf(
-            e.target.parentNode
-          );
-          filesToUpload.splice(indexToRemove, 1);
-          console.log(filesToUpload);
-          preview.remove();
-          fileInput.value = '';
-          if (filesToUpload.length !== 0) {
-            uploadButton.style.display = 'none';
-          } else {
-            uploadButton.style.display = 'initial';
-          }
-        });
+      const delBttn = document.createElement('button');
+      delBttn.classList.add('delete-button');
+      delBttn.innerText = 'Delete';
+      delBttn.addEventListener('click', (e) => {
+        const indexToRemove = Array.from(filePreviews.children).indexOf(
+          e.target.parentNode
+        );
+        filesToUpload.splice(indexToRemove, 1);
+        console.log(filesToUpload);
+        preview.remove();
+        fileInput.value = '';
+        if (filesToUpload.length !== 0) {
+          uploadButton.style.display = 'none';
+        } else {
+          uploadButton.style.display = 'initial';
+        }
+      });
 
-        preview.appendChild(img);
-        preview.appendChild(desc);
-        preview.appendChild(delBttn);
+      preview.appendChild(desc);
+      preview.appendChild(delBttn);
+      filePreviews.appendChild(preview);
 
-        filePreviews.appendChild(preview);
-      };
-      reader.readAsDataURL(file);
       if (filesToUpload.length !== 0) {
         uploadButton.style.display = 'none';
       } else {
