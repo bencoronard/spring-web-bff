@@ -21,6 +21,9 @@ const storage = multer.diskStorage({
 // Multer upload instance
 const upload = multer({ storage });
 
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, "public")));
+
 // API endpoint for file upload
 app.post("/api/uploads", upload.single("pdfFile"), (req, res) => {
   if (!req.file) {
@@ -32,21 +35,12 @@ app.post("/api/uploads", upload.single("pdfFile"), (req, res) => {
   });
 });
 
-// Another API endpoint that expects JSON data
-app.post("/api/data", (req, res) => {
-  const { name, age } = req.body;
-  if (!name || !age) {
-    return res.status(400).json({ error: "Name and age are required." });
-  }
-  res.status(200).json({ message: "Data received successfully.", name, age });
-});
-
 // GET endpoint
-app.get("/api/data", (req, res) => {
-  const { param1, param2 } = req.query; // Access query parameters
-
+app.get("/api/data/:id", (req, res) => {
   // Handle the parameters as needed
-  res.status(200).json({ message: "GET request received.", param1, param2 });
+  res
+    .status(200)
+    .json({ message: "GET request received.", ...req.query, ...req.params });
 });
 
 // Start the server
