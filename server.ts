@@ -25,15 +25,25 @@ const upload = multer({ storage });
 app.use(express.static(path.join(__dirname, "public")));
 
 // API endpoint for file upload
-app.post("/api/uploads", upload.single("pdfFile"), (req, res) => {
+app.post("/api/uploads", (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded." });
   }
+  console.log(req.file);
   res.status(200).json({
     message: "File uploaded successfully.",
     filename: req.file.originalname,
   });
 });
+// app.post("/api/uploads", upload.single("pdfFile"), (req, res) => {
+//   if (!req.file) {
+//     return res.status(400).json({ error: "No file uploaded." });
+//   }
+//   res.status(200).json({
+//     message: "File uploaded successfully.",
+//     filename: req.file.originalname,
+//   });
+// });
 
 // GET endpoint
 app.get("/api/data/:id", (req, res) => {

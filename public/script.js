@@ -4,6 +4,7 @@ const filePreviews = document.getElementById("filePreviews");
 const fileInput = document.getElementById("fileInput");
 const compressButton = document.getElementById("compressButton");
 const uploadButton = document.getElementById("uploadButton");
+const submitButton = document.getElementById("submitButton");
 let filesToUpload = [];
 
 fileInput.addEventListener("change", () => {
@@ -27,6 +28,8 @@ dropZone.addEventListener("drop", (e) => {
   const files = e.dataTransfer.files;
   handleFiles(files);
 });
+
+submitButton.addEventListener("click", sendFiles);
 
 function handleFiles(files) {
   Array.from(files).forEach((file) => {
@@ -81,25 +84,25 @@ function handleFiles(files) {
   });
 }
 
-// function compressFiles(files) {
-//   const formData = new FormData();
-//   Array.from(files).forEach((file) => {
-//     formData.append('files', file);
-//   });
-
-//   fetch('http://localhost:3000/api/uploads', {
-//     method: 'POST',
-//     body: formData,
-//   })
-//     .then((response) => {
-//       if (response.ok) {
-//         alert('Files uploaded successfully!');
-//       } else {
-//         alert('Error uploading files.');
-//       }
-//     })
-//     .catch((error) => {
-//       console.error('Error uploading files:', error);
-//       alert('Error uploading files.');
-//     });
-// }
+async function sendFiles() {
+  if (filesToUpload.length === 0) {
+    alert("No files uploaded");
+    return;
+  }
+  const formData = new FormData();
+  filesToUpload.forEach((file) => {
+    formData.append("files", file);
+  });
+  try {
+    const response = await fetch("http://localhost:3000/api/uploads", {
+      method: "POST",
+      body: formData,
+    });
+    console.log(response);
+    // const data = await response.json();
+    // alert(response);
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    alert("Error uploading file.");
+  }
+}
