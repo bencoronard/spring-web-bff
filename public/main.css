@@ -1,0 +1,33 @@
+div {
+  background-color: rgba(203, 152, 252, 0.8);
+  max-width: 1200px;
+  height: 300px;
+  border: 2px dashed rgb(152, 42, 255);
+  border-radius: 20px;
+
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-vertical {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-horizontal {
+  display: flex;
+  flex-direction: row;
+}
+
+label {
+  background-color: aqua;
+}
+
+#fileInput {
+  display: none;
+}
+
+.highlight {
+  background-color: rgba(191, 255, 106, 0.8);
+  border: 2px dashed rgb(81, 255, 0);
+}

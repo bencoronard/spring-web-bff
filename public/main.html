@@ -3,17 +3,33 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="main.css" />
     <title>Drag and Drop</title>
   </head>
   <body>
     <p>
-      <strong>Uploading status:</strong>
+      <strong>Status:</strong>
       <span id="statusMessage">🤷‍♂ Nothing's uploaded</span>
     </p>
+
+    <progress value="0" max="100"></progress>
+
     <form>
-      <input name="file" type="file" multiple accept="application/pdf" />
-      <button type="submit">Upload</button>
+      <div id="dropZone" class="flex-vertical">
+        <ul id="filePreviews" class="flex-horizontal"></ul>
+        <label for="fileInput">Select Files</label>
+        <input id="fileInput" type="file" multiple accept="application/pdf" />
+      </div>
+      <button id="submitButton" type="submit">Upload</button>
     </form>
-    <script src="main.js"></script>
+
+    <p>
+      <strong>Uploaded files:</strong>
+      <span id="fileCounter">0</span>
+    </p>
+
+    <ul id="fileListMetadata"></ul>
+
+    <script type="module" src="main.js"></script>
   </body>
 </html>
