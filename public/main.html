@@ -15,12 +15,21 @@
     <progress value="0" max="100"></progress>
 
     <form>
-      <div id="dropZone" class="flex-vertical">
+      <div id="dropZone" class="drop-area flex-vertical">
         <ul id="filePreviews"></ul>
-        <label for="fileInput">Select Files</label>
+
         <input id="fileInput" type="file" multiple accept="application/pdf" />
+
+        <div id="buttons">
+          <label for="fileInput">Select Files</label>
+          <button id="downloadButton" type="button">Download</button>
+          <button id="resetButton" type="reset">Restart</button>
+        </div>
       </div>
-      <button id="submitButton" type="submit">Upload</button>
+
+      <div id="options"></div>
+
+      <button id="submitButton" type="submit">Compress</button>
     </form>
 
     <p>
