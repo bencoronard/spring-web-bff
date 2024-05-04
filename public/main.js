@@ -86,26 +86,9 @@ function handleDownload() {
 
 function handleSubmit(event) {
   event.preventDefault();
-  mockSending();
-  // sendFiles(filesToUpload);
-}
-function mockSending() {
-  statusMessage.update("⏳ Pending...");
 
-  setTimeout(() => {
-    filesToUpload.forEach((file) => {
-      filesToDownload.push(file);
-    });
-    filesToUpload.splice(0);
-    statusMessage.update("✅ Success");
-    progressBar.update(0);
-    filesToUpload.splice(0);
-    filePreviews.clear();
-    filePreviews.update(
-      filesToDownload.map((file) => file.name + " is ready."),
-      false
-    );
-  }, 2000);
+  sendFiles(filesToUpload);
+  // mockSending();
 }
 
 function extractFiles(fileList) {
@@ -128,37 +111,59 @@ function extractFiles(fileList) {
   }
 }
 
-// function sendFiles(files) {
-//   statusMessage.update("⏳ Pending...");
-//   submitButton.disable();
-//   const url = "https://httpbin.org/post";
-//   const method = "POST";
-//   const xhr = new XMLHttpRequest();
+function mockSending() {
+  statusMessage.update("⏳ Pending...");
 
-//   const data = new FormData();
-//   for (const file of files) {
-//     data.append("file", file);
-//   }
+  setTimeout(() => {
+    filesToUpload.forEach((file) => {
+      filesToDownload.push(file);
+    });
+    filesToUpload.splice(0);
+    statusMessage.update("✅ Success");
+    progressBar.update(0);
+    filePreviews.update(
+      filesToDownload.map((file) => file.name + " is ready."),
+      false
+    );
+  }, 2000);
+}
 
-//   xhr.addEventListener("loadend", () => {
-//     if (xhr.status === 200) {
-//       statusMessage.update("✅ Success");
-//       downloadButton.enable();
-//       resetButton.enable();
-//     } else {
-//       statusMessage.update("❌ Error");
-//     }
-//     progressBar.update(0);
-//   });
+function sendFiles(files) {
+  statusMessage.update("⏳ Pending...");
+  const url = "https://httpbin.org/post";
+  const method = "POST";
+  const xhr = new XMLHttpRequest();
 
-//   xhr.upload.addEventListener("progress", (event) => {
-//     statusMessage.update(`⏳ Uploaded ${event.loaded} bytes of ${event.total}`);
-//     progressBar.update(event.loaded / event.total);
-//   });
+  const data = new FormData();
+  for (const file of files) {
+    data.append("file", file);
+  }
 
-//   xhr.open(method, url);
-//   xhr.send(data);
-// }
+  xhr.addEventListener("loadend", () => {
+    if (xhr.status === 200) {
+      filesToUpload.forEach((file) => {
+        filesToDownload.push(file);
+      });
+      filesToUpload.splice(0);
+      filePreviews.update(
+        filesToDownload.map((file) => file.name + " is ready."),
+        false
+      );
+      statusMessage.update("✅ Success");
+    } else {
+      statusMessage.update("❌ Error");
+    }
+    progressBar.update(0);
+  });
+
+  xhr.upload.addEventListener("progress", (event) => {
+    statusMessage.update(`⏳ Uploaded ${event.loaded} bytes of ${event.total}`);
+    progressBar.update(event.loaded / event.total);
+  });
+
+  xhr.open(method, url);
+  xhr.send(data);
+}
 
 const observer = new MutationObserver((mutationsList) => {
   for (let mutation of mutationsList) {

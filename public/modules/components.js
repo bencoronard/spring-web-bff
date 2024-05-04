@@ -155,7 +155,8 @@ export class ChromaticList {
   setStage(stage) {
     this.reset();
     const children = this.pointer.children;
-    for (let i = 1; i <= stage; i++) {
+    const limit = Math.min(stage, this.numChild - 1);
+    for (let i = 1; i <= limit; i++) {
       this.addColor(i);
     }
   }
