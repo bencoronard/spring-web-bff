@@ -9,7 +9,7 @@ export class DynamicButton {
     this.pointer.disabled = true;
   }
   addClickHandle(handle) {
-    this.pointer.addEventListener('click', handle);
+    this.pointer.addEventListener("click", handle);
   }
 }
 
@@ -20,14 +20,14 @@ export class PreviewList {
   update(items) {
     this.clear();
     items.forEach((item) => {
-      const li = document.createElement('li');
+      const li = document.createElement("li");
       li.classList.add(`${this.pointer.id}-item`);
       li.textContent = item;
       this.pointer.appendChild(li);
     });
   }
   clear() {
-    this.pointer.innerHTML = '';
+    this.pointer.innerHTML = "";
   }
 }
 
@@ -40,7 +40,7 @@ export class PreviewListInteractive extends PreviewList {
   update(items) {
     this.clear();
     items.forEach((item) => {
-      const li = document.createElement('li');
+      const li = document.createElement("li");
       li.classList.add(`${this.pointer.id}-item`);
       li.textContent = item;
       this.pointer.appendChild(li);
@@ -49,14 +49,13 @@ export class PreviewListInteractive extends PreviewList {
   }
 
   addButton(element) {
-    const deleteButton = document.createElement('button');
+    const deleteButton = document.createElement("button");
     deleteButton.classList.add(`${this.pointer.id}-item-delBtn`);
-    deleteButton.textContent = 'x';
-    deleteButton.addEventListener('click', () => {
+    deleteButton.textContent = "x";
+    deleteButton.addEventListener("click", () => {
       const index = Array.from(this.pointer.children).indexOf(element);
       this.pointer.removeChild(element);
       this.statePointer.splice(index, 1);
-      console.log(this.statePointer);
     });
     element.appendChild(deleteButton);
   }
@@ -81,24 +80,27 @@ export class StatusText {
 }
 
 export class DropZone {
-  constructor(htmlElement) {
+  constructor(htmlElement, dropHandle) {
     this.pointer = htmlElement;
+    this.dropHandle = dropHandle;
   }
 
   enable() {
+    this.pointer.classList.remove("lowlight");
+
     let dragEventCounter = 0;
 
-    this.pointer.addEventListener('dragenter', (event) => {
+    this.pointer.addEventListener("dragenter", (event) => {
       event.preventDefault();
 
       if (dragEventCounter === 0) {
-        this.pointer.classList.add('highlight');
+        this.pointer.classList.add("highlight");
       }
 
       dragEventCounter += 1;
     });
 
-    this.pointer.addEventListener('dragover', (event) => {
+    this.pointer.addEventListener("dragover", (event) => {
       event.preventDefault();
 
       if (dragEventCounter === 0) {
@@ -106,32 +108,29 @@ export class DropZone {
       }
     });
 
-    this.pointer.addEventListener('dragleave', (event) => {
+    this.pointer.addEventListener("dragleave", (event) => {
       event.preventDefault();
 
       dragEventCounter -= 1;
 
       if (dragEventCounter <= 0) {
         dragEventCounter = 0;
-        this.pointer.classList.remove('highlight');
+        this.pointer.classList.remove("highlight");
       }
     });
 
-    this.pointer.addEventListener('drop', (event) => {
+    this.pointer.addEventListener("drop", (event) => {
       event.preventDefault();
 
       dragEventCounter = 0;
-      this.pointer.classList.remove('highlight');
+      this.pointer.classList.remove("highlight");
     });
-    return this;
+
+    this.pointer.addEventListener("drop", this.dropHandle);
   }
 
   disable() {
-    const clonedElement = this.pointer.cloneNode(true);
-    this.pointer.parentNode.replaceChild(clonedElement, this.pointer);
-  }
-
-  addDropHandle(handle) {
-    this.pointer.addEventListener('drop', handle);
+    this.pointer.removeEventListener("drop", this.dropHandle);
+    this.pointer.classList.add("lowlight");
   }
 }

@@ -31,3 +31,7 @@ label {
   background-color: rgba(191, 255, 106, 0.8);
   border: 2px dashed rgb(81, 255, 0);
 }
+.lowlight {
+  background-color: rgba(147, 147, 147, 0.8);
+  border: 2px dashed rgb(84, 84, 84);
+}
