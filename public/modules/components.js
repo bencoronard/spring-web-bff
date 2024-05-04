@@ -37,14 +37,16 @@ export class PreviewListInteractive extends PreviewList {
     this.statePointer = statePointer;
   }
 
-  update(items) {
+  update(items, option) {
     this.clear();
     items.forEach((item) => {
       const li = document.createElement("li");
       li.classList.add(`${this.pointer.id}-item`);
       li.textContent = item;
       this.pointer.appendChild(li);
-      this.addButton(li);
+      if (option) {
+        this.addButton(li);
+      }
     });
   }
 

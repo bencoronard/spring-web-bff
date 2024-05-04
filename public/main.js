@@ -23,7 +23,6 @@ const fileDropZone = new DropZone(
     handleFileUpload(event.dataTransfer.files);
   }
 );
-const fileUploads = new PreviewList(document.getElementById("fileUploads"));
 const filePreviews = new PreviewListInteractive(
   document.getElementById("filePreviews"),
   filesToUpload
@@ -52,9 +51,9 @@ resetFormState();
 function resetFormState() {
   filesToUpload.splice(0);
   filesToDownload.splice(0);
+  fileInput.value = "";
 
   filePreviews.clear();
-  fileUploads.clear();
 
   selectButton.enable();
   submitButton.disable();
@@ -71,7 +70,10 @@ function handleFileUpload(uploadedFiles) {
   } catch (err) {
     statusMessage.update(err.message);
   }
-  filePreviews.update(filesToUpload.map((file) => file.name));
+  filePreviews.update(
+    filesToUpload.map((file) => file.name),
+    true
+  );
   submitButton.enable();
 }
 
@@ -94,10 +96,12 @@ function mockSending() {
     filesToUpload.splice(0);
     statusMessage.update("✅ Success");
     progressBar.update(0);
-    fileUploads.update(filesToUpload.map((file) => file.name));
     filesToUpload.splice(0);
     filePreviews.clear();
-    filePreviews.update(filesToDownload.map((file) => file.name));
+    filePreviews.update(
+      filesToDownload.map((file) => file.name + " is ready."),
+      false
+    );
   }, 2000);
 }
 
@@ -136,7 +140,6 @@ function extractFiles(fileList) {
 //   xhr.addEventListener("loadend", () => {
 //     if (xhr.status === 200) {
 //       statusMessage.update("✅ Success");
-//       fileUploads.update(filesToUpload.map((file) => file.name));
 //       downloadButton.enable();
 //       resetButton.enable();
 //     } else {
