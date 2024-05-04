@@ -4,22 +4,29 @@ import {
   PreviewList,
   DynamicButton,
   DropZone,
+  PreviewListInteractive,
 } from './modules/components.js';
+
+const filesToUpload = [];
+const filesToDownload = [];
 
 const downloadButton = new DynamicButton(
   document.getElementById('downloadButton')
 );
+
 const resetButton = new DynamicButton(document.getElementById('resetButton'));
 const submitButton = new DynamicButton(document.getElementById('submitButton'));
 const fileDropZone = new DropZone(document.getElementById('dropZone'));
 const fileUploads = new PreviewList(document.getElementById('fileUploads'));
-const filePreviews = new PreviewList(document.getElementById('filePreviews'));
+const filePreviews = new PreviewListInteractive(
+  document.getElementById('filePreviews'),
+  filesToUpload
+);
 const statusMessage = new StatusText(document.getElementById('statusMessage'));
 const progressBar = new ProgressBar(document.querySelector('progress'));
 
 const form = document.querySelector('form');
 const fileInput = document.getElementById('fileInput');
-let filesToUpload = [];
 
 fileDropZone.enable().addDropHandle(handleDrop);
 form.addEventListener('submit', handleSubmit);
@@ -37,19 +44,27 @@ function resetFormState() {
   statusMessage.update(`🤷‍♂ Nothing's uploaded`);
   filePreviews.clear();
   fileUploads.clear();
+  filesToUpload.splice(0);
+  filesToDownload.splice(0);
 }
 
 function handleInputChange() {
-  resetFormState();
+  handleFileUpload(fileInput.files);
+}
+
+function handleDrop(event) {
+  handleFileUpload(event.dataTransfer.files);
+}
+
+function handleFileUpload(uploadedFiles) {
   try {
-    assertFilesValid(fileInput.files);
+    extractFiles(uploadedFiles);
   } catch (err) {
     statusMessage.update(err.message);
-    return;
   }
-  const fileNames = Array.from(fileInput.files).map((file) => file.name);
-  filePreviews.update(fileNames);
+  filePreviews.update(filesToUpload.map((file) => file.name));
   submitButton.enable();
+  console.log(filesToUpload);
 }
 
 function handleDownload() {
@@ -58,27 +73,32 @@ function handleDownload() {
 
 function handleSubmit(event) {
   event.preventDefault();
-  sendFiles(fileInput.files);
+  sendFiles(filesToUpload);
 }
 
-function handleDrop(event) {
-  const fileList = event.dataTransfer.files;
-  resetFormState();
-  try {
-    assertFilesValid(fileList);
-  } catch (err) {
-    statusMessage.update(err.message);
-    return;
+function extractFiles(fileList) {
+  const allowedTypes = ['application/pdf'];
+  const existingFiles = filesToUpload.map((file) => file.name);
+  const invalidFiles = [];
+  for (const file of fileList) {
+    if (!allowedTypes.includes(file.type)) {
+      invalidFiles.push(file.name);
+      continue;
+    }
+    if (!existingFiles.includes(file.name)) {
+      filesToUpload.push(file);
+    }
   }
-  fileInput.files = fileList;
-  const fileNames = Array.from(fileList).map((file) => file.name);
-  filePreviews.update(fileNames);
-  submitButton.enable();
-  console.log(fileInput.files);
+  if (invalidFiles.length) {
+    throw new Error(
+      `❌ Could not upload following files: ${invalidFiles.join(', ')}`
+    );
+  }
 }
 
 function sendFiles(files) {
   statusMessage.update('⏳ Pending...');
+  submitButton.disable();
   const url = 'https://httpbin.org/post';
   const method = 'POST';
   const xhr = new XMLHttpRequest();
@@ -91,8 +111,7 @@ function sendFiles(files) {
   xhr.addEventListener('loadend', () => {
     if (xhr.status === 200) {
       statusMessage.update('✅ Success');
-      const fileNames = Array.from(fileInput.files).map((file) => file.name);
-      fileUploads.update(fileNames);
+      fileUploads.update(filesToUpload.map((file) => file.name));
       downloadButton.enable();
       resetButton.enable();
     } else {
@@ -110,12 +129,20 @@ function sendFiles(files) {
   xhr.send(data);
 }
 
-function assertFilesValid(fileList) {
-  const allowedTypes = ['application/pdf'];
-
-  for (const file of fileList) {
-    if (!allowedTypes.includes(file.type)) {
-      throw new Error(`❌ File "${file.name}" could not be uploaded.`);
+// Create a new instance of MutationObserver and define a callback function
+const observer = new MutationObserver((mutationsList) => {
+  // Loop through each mutation
+  for (let mutation of mutationsList) {
+    // Check if nodes were added or removed from the target node's children
+    if (mutation.type === 'childList') {
+      // Handle the changes here, for example:
+      if (filesToUpload.length === 0) {
+        submitButton.disable();
+      } else {
+        submitButton.enable();
+      }
     }
   }
-}
+});
+
+observer.observe(filePreviews.pointer, { childList: true });

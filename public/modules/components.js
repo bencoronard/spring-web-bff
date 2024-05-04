@@ -31,6 +31,37 @@ export class PreviewList {
   }
 }
 
+export class PreviewListInteractive extends PreviewList {
+  constructor(htmlElement, statePointer) {
+    super(htmlElement);
+    this.statePointer = statePointer;
+  }
+
+  update(items) {
+    this.clear();
+    items.forEach((item) => {
+      const li = document.createElement('li');
+      li.classList.add(`${this.pointer.id}-item`);
+      li.textContent = item;
+      this.pointer.appendChild(li);
+      this.addButton(li);
+    });
+  }
+
+  addButton(element) {
+    const deleteButton = document.createElement('button');
+    deleteButton.classList.add(`${this.pointer.id}-item-delBtn`);
+    deleteButton.textContent = 'x';
+    deleteButton.addEventListener('click', () => {
+      const index = Array.from(this.pointer.children).indexOf(element);
+      this.pointer.removeChild(element);
+      this.statePointer.splice(index, 1);
+      console.log(this.statePointer);
+    });
+    element.appendChild(deleteButton);
+  }
+}
+
 export class ProgressBar {
   constructor(htmlElement) {
     this.pointer = htmlElement;
@@ -104,26 +135,3 @@ export class DropZone {
     this.pointer.addEventListener('drop', handle);
   }
 }
-
-// export class FileForm {
-//   constructor(htmlElement) {
-//     this.pointer = htmlElement;
-//     this.stage = 1;
-//   }
-//   init() {
-//     return this;
-//   }
-//   addSubmitHandle(handle) {
-//     this.pointer.addEventListener('submit', handle);
-//   }
-
-//   reset(handle) {
-//     handle();
-//   }
-
-//   submit() {}
-
-//   getStage() {
-//     return this.stage;
-//   }
-// }
