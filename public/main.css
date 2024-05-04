@@ -9,14 +9,30 @@
   align-items: center;
 }
 
+#stageBar {
+  width: 50%;
+}
+.stage {
+  border: 2px dashed black;
+  border-radius: 1em;
+  padding: 0.25em;
+}
+
+.completed {
+  border: 2px solid saddlebrown;
+  color: saddlebrown;
+}
+
 .flex-vertical {
   display: flex;
   flex-direction: column;
 }
-
 .flex-horizontal {
   display: flex;
   flex-direction: row;
+}
+.flex-spread {
+  justify-content: space-between;
 }
 
 label {
