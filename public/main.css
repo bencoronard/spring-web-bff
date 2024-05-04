@@ -9,8 +9,8 @@
   align-items: center;
 }
 
-#stageBar {
-  width: 50%;
+#stageList {
+  width: 80%;
 }
 .stage {
   border: 2px dashed black;
@@ -18,7 +18,7 @@
   padding: 0.25em;
 }
 
-.completed {
+.colored {
   border: 2px solid saddlebrown;
   color: saddlebrown;
 }

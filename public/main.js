@@ -5,6 +5,7 @@ import {
   DynamicButton,
   DropZone,
   PreviewListInteractive,
+  ChromaticList,
 } from "./modules/components.js";
 
 const filesToUpload = [];
@@ -30,6 +31,7 @@ const filePreviews = new PreviewListInteractive(
 
 const statusMessage = new StatusText(document.getElementById("statusMessage"));
 const progressBar = new ProgressBar(document.querySelector("progress"));
+const stageList = new ChromaticList(document.getElementById("stageList"));
 
 const form = document.querySelector("form");
 const fileInput = document.getElementById("fileInput");
@@ -60,6 +62,7 @@ function resetFormState() {
   resetButton.disable();
   downloadButton.disable();
   fileDropZone.enable();
+  stageList.reset();
 
   statusMessage.update(`🤷‍♂ Nothing's uploaded`);
 }
@@ -166,16 +169,19 @@ const observer = new MutationObserver((mutationsList) => {
         case "00":
           submitButton.disable();
           resetButton.disable();
+          stageList.setStage(0);
           break;
         case "10":
           submitButton.enable();
           resetButton.enable();
+          stageList.setStage(1);
           break;
         case "01":
           selectButton.disable();
           submitButton.disable();
           downloadButton.enable();
           fileDropZone.disable();
+          stageList.setStage(2);
           break;
       }
     }

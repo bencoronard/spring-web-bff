@@ -136,3 +136,34 @@ export class DropZone {
     this.pointer.classList.add("lowlight");
   }
 }
+
+export class ChromaticList {
+  constructor(htmlElement) {
+    this.pointer = htmlElement;
+    this.numChild = htmlElement.childElementCount;
+    this.currentStage = 0;
+    this.addColor(this.currentStage);
+  }
+
+  addColor(index) {
+    this.pointer.children[index].classList.add("colored");
+  }
+  removeColor(index) {
+    this.pointer.children[index].classList.remove("colored");
+  }
+
+  setStage(stage) {
+    this.reset();
+    const children = this.pointer.children;
+    for (let i = 1; i <= stage; i++) {
+      this.addColor(i);
+    }
+  }
+
+  reset() {
+    const children = this.pointer.children;
+    for (let i = 1; i < this.numChild; i++) {
+      this.removeColor(i);
+    }
+  }
+}
