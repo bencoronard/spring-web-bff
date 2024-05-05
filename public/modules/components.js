@@ -52,12 +52,14 @@ export class PreviewListInteractive extends PreviewList {
 
   addButton(element) {
     const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
     deleteButton.classList.add(`${this.pointer.id}-item-delBtn`);
     deleteButton.textContent = "x";
     deleteButton.addEventListener("click", () => {
       const index = Array.from(this.pointer.children).indexOf(element);
       this.pointer.removeChild(element);
       this.statePointer.splice(index, 1);
+      console.log("delButton click event triggered");
     });
     element.appendChild(deleteButton);
   }
@@ -165,6 +167,24 @@ export class ChromaticList {
     const children = this.pointer.children;
     for (let i = 1; i < this.numChild; i++) {
       this.removeColor(i);
+    }
+  }
+}
+
+export class HidableElement {
+  constructor(htmlElement) {
+    this.pointer = htmlElement;
+  }
+
+  hide() {
+    if (!this.pointer.classList.contains("hidden")) {
+      this.pointer.classList.add("hidden");
+    }
+  }
+
+  show() {
+    if (this.pointer.classList.contains("hidden")) {
+      this.pointer.classList.remove("hidden");
     }
   }
 }

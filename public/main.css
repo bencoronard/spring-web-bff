@@ -40,7 +40,9 @@ body {
   justify-content: center;
   align-items: center;
 }
-
+.hidden {
+  display: none;
+}
 .colored {
   border: 2px solid rgb(0, 0, 0);
   color: rgb(0, 0, 0);
@@ -57,7 +59,6 @@ body {
 .flex-spread {
   justify-content: space-between;
 }
-
 #fileInput {
   display: none;
 }
@@ -89,7 +90,7 @@ body {
 }
 #slide-switch label::before {
   position: absolute;
-  content: '';
+  content: "";
   background-color: #fff;
   height: 1.5em;
   aspect-ratio: 1;
@@ -101,9 +102,6 @@ body {
 }
 #slide-switch input:checked + label::before {
   transform: translateX(1.5em);
-}
-#slide-switch input {
-  display: none;
 }
 
 .container {
