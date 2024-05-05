@@ -45,7 +45,7 @@ selectButton.addClickHandle(() => {
 downloadButton.addClickHandle(handleDownload);
 
 formJSON.pointer.addEventListener("submit", handleSubmit);
-formJSON.pointer.addEventListener("reset", resetFormState);
+formJSON.pointer.addEventListener("reset", resetAppState);
 // formJSON.pointer.addEventListener("change", () => {
 //   console.log(formJSON.getValues());
 // });
@@ -54,7 +54,7 @@ fileInput.addEventListener("change", () => {
   handleFileUpload(fileInput.files);
 });
 
-resetFormState();
+resetAppState();
 
 const appStateTracker = new MutationObserver((mutationsList) => {
   for (let mutation of mutationsList) {
@@ -89,7 +89,7 @@ const appStateTracker = new MutationObserver((mutationsList) => {
 appStateTracker.observe(filePreviews.pointer, { childList: true });
 
 // Functions
-function resetFormState() {
+function resetAppState() {
   filesToUpload.splice(0);
   filesToDownload.splice(0);
   fileInput.value = "";
