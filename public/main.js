@@ -1,4 +1,3 @@
-import { JsonForm } from "./modules/JsonForm.js";
 import {
   StatusText,
   ProgressBar,
@@ -7,10 +6,8 @@ import {
   PreviewListInteractive,
   ChromaticList,
   HidableElement,
+  JsonForm,
 } from "./modules/components.js";
-
-const filesToUpload = [];
-const filesToDownload = [];
 
 const downloadButton = new DynamicButton(
   document.getElementById("downloadButton")
@@ -34,28 +31,24 @@ const statusMessage = new StatusText(document.getElementById("statusMessage"));
 const progressBar = new ProgressBar(document.querySelector("progress"));
 const stageList = new ChromaticList(document.getElementById("stageList"));
 
-const form = document.querySelector("form");
-const formJSON = new JsonForm(form);
+const formJSON = new JsonForm(document.querySelector("form"));
 
 const fileInput = document.getElementById("fileInput");
 const fileOptions = new HidableElement(document.getElementById("options"));
+
+const filesToUpload = [];
+const filesToDownload = [];
 
 selectButton.addClickHandle(() => {
   fileInput.click();
 });
 downloadButton.addClickHandle(handleDownload);
 
-form.addEventListener("submit", handleSubmit);
-form.addEventListener("reset", resetFormState);
-form.addEventListener("change", () => {
-  console.log(formJSON.getValues().colorMode);
-});
-
-fileOptions.pointer.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    event.preventDefault();
-  }
-});
+formJSON.pointer.addEventListener("submit", handleSubmit);
+formJSON.pointer.addEventListener("reset", resetFormState);
+// formJSON.pointer.addEventListener("change", () => {
+//   console.log(formJSON.getValues());
+// });
 
 fileInput.addEventListener("change", () => {
   handleFileUpload(fileInput.files);
