@@ -44,7 +44,10 @@ export class PreviewListInteractive extends PreviewList {
       li.classList.add(`${this.pointer.id}-item`);
       li.textContent = item;
       this.pointer.appendChild(li);
-      if (option) {
+      if (option.bar) {
+        this.addProgressBar(li);
+      }
+      if (option.button) {
         this.addButton(li);
       }
     });
@@ -61,6 +64,14 @@ export class PreviewListInteractive extends PreviewList {
       this.statePointer.splice(index, 1);
     });
     element.appendChild(deleteButton);
+  }
+
+  addProgressBar(element) {
+    const progressBar = document.createElement("progress");
+    progressBar.value = 0;
+    progressBar.max = 100;
+    progressBar.classList.add(`${this.pointer.id}-item-progBar`);
+    element.appendChild(progressBar);
   }
 }
 

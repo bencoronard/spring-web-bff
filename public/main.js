@@ -9,6 +9,9 @@ import {
   JsonForm,
 } from "./modules/components.js";
 
+const filesToUpload = [];
+const filesToDownload = [];
+
 const downloadButton = new DynamicButton(
   document.getElementById("downloadButton")
 );
@@ -35,9 +38,6 @@ const formJSON = new JsonForm(document.querySelector("form"));
 
 const fileInput = document.getElementById("fileInput");
 const fileOptions = new HidableElement(document.getElementById("options"));
-
-const filesToUpload = [];
-const filesToDownload = [];
 
 selectButton.addClickHandle(() => {
   fileInput.click();
@@ -114,7 +114,7 @@ function handleFileUpload(uploadedFiles) {
   }
   filePreviews.update(
     filesToUpload.map((file) => file.name),
-    true
+    { button: true, bar: true }
   );
   submitButton.enable();
 }
@@ -169,7 +169,7 @@ function mockSending(filesToUpload) {
 
     filePreviews.update(
       filesToDownload.map((file) => file.name + " is ready."),
-      false
+      { button: false, bar: false }
     );
 
     clearInterval(progressBarUpdateTimer);
@@ -200,7 +200,7 @@ function sendFiles(files) {
       filesToUpload.splice(0);
       filePreviews.update(
         filesToDownload.map((file) => file.name + " is ready."),
-        false
+        { button: false, bar: false }
       );
       statusMessage.update("✅ Success");
     } else {
