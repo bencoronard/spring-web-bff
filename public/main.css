@@ -1,3 +1,21 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  text-decoration: none;
+  color: inherit;
+}
+:root {
+  --font-normal: 16px;
+  --r-border: 0.5em;
+  --t-animation: 200ms;
+}
+body {
+  font-size: var(--font-normal);
+}
 .drop-area {
   background-color: rgba(203, 152, 252, 0.8);
   max-width: 1200px;
@@ -10,7 +28,7 @@
 }
 
 #stageList {
-  width: 80%;
+  width: 100%;
 }
 .stage {
   border: 2px dashed black;
@@ -18,9 +36,14 @@
   padding: 0.25em;
 }
 
+.flex-centered {
+  justify-content: center;
+  align-items: center;
+}
+
 .colored {
-  border: 2px solid saddlebrown;
-  color: saddlebrown;
+  border: 2px solid rgb(0, 0, 0);
+  color: rgb(0, 0, 0);
 }
 
 .flex-vertical {
@@ -35,10 +58,6 @@
   justify-content: space-between;
 }
 
-label {
-  background-color: aqua;
-}
-
 #fileInput {
   display: none;
 }
@@ -50,4 +69,55 @@ label {
 .lowlight {
   background-color: rgba(147, 147, 147, 0.8);
   border: 2px dashed rgb(84, 84, 84);
+}
+
+#slide-switch {
+  width: fit-content;
+  height: fit-content;
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+}
+#slide-switch label {
+  background-color: #d2d2d2;
+  width: 3em;
+  height: 1.5em;
+  border-radius: 0.75em;
+  cursor: pointer;
+  position: relative;
+  transition: var(--t-animation);
+}
+#slide-switch label::before {
+  position: absolute;
+  content: '';
+  background-color: #fff;
+  height: 1.5em;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transition: var(--t-animation);
+}
+#slide-switch input:checked + label {
+  background-color: #20096d;
+}
+#slide-switch input:checked + label::before {
+  transform: translateX(1.5em);
+}
+#slide-switch input {
+  display: none;
+}
+
+.container {
+  width: fit-content;
+  height: fit-content;
+  border: 1px solid cyan;
+}
+.wrapper {
+  width: fit-content;
+  height: fit-content;
+  border: 1px dashed red;
+}
+
+#options {
+  border: 2px solid green;
+  max-width: 1200px;
 }

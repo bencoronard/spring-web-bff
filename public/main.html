@@ -34,7 +34,49 @@
         </div>
       </div>
 
-      <div id="options"></div>
+      <div id="options">
+        <div class="container flex-vertical">
+          <label for="slider"><strong>Level of compression</strong></label>
+          <div class="wrapper flex-horizontal">
+            <span>Small Size<br />Low Quality</span>
+            <input
+              type="range"
+              id="slider"
+              name="slider"
+              min="0"
+              max="100"
+              value="50"
+            />
+            <span>Big Size<br />High Quality</span>
+          </div>
+        </div>
+
+        <div class="container flex-horizontal">
+          <div class="wrapper">
+            <label for="dpi">DPI</label>
+            <input type="number" id="dpi" min="72" max="300" value="144" />
+          </div>
+
+          <div class="wrapper">
+            <label for="imgQual">Image quality</label>
+            <input
+              type="number"
+              id="imgQual"
+              name="range2"
+              min="0"
+              max="100"
+              value="100"
+            />
+          </div>
+
+          <div id="slide-switch" class="wrapper">
+            <span>Color</span>
+            <input type="checkbox" id="colorMode" />
+            <label for="colorMode"></label>
+            <span>Gray</span>
+          </div>
+        </div>
+      </div>
 
       <button id="submitButton" type="submit">Compress</button>
     </form>
