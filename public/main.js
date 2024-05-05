@@ -9,6 +9,8 @@ import {
   JsonForm,
 } from "./modules/components.js";
 
+const display = document.getElementById("display");
+
 const filesToUpload = [];
 const filesToDownload = [];
 
@@ -31,7 +33,6 @@ const filePreviews = new PreviewListInteractive(
 );
 
 const statusMessage = new StatusText(document.getElementById("statusMessage"));
-const progressBar = new ProgressBar(document.querySelector("progress"));
 const stageList = new ChromaticList(document.getElementById("stageList"));
 
 const formJSON = new JsonForm(document.querySelector("form"));
@@ -104,6 +105,8 @@ function resetAppState() {
   fileOptions.hide();
 
   statusMessage.update(`🤷‍♂ Nothing's uploaded`);
+
+  display.innerText = "";
 }
 
 function handleFileUpload(uploadedFiles) {
@@ -127,7 +130,8 @@ function handleSubmit(event) {
   event.preventDefault();
 
   // sendFiles(filesToUpload);
-  mockSending(filesToUpload);
+  sendFilesMultiple(filesToUpload);
+  // mockSending(filesToUpload);
 }
 
 function extractFiles(fileList) {
@@ -216,4 +220,73 @@ function sendFiles(files) {
 
   xhr.open(method, url);
   xhr.send(data);
+}
+
+function xhrFileUpload(data, progress, button) {
+  return new Promise((resolve, reject) => {
+    const url = "https://httpbin.org/post";
+    const method = "POST";
+    const deleteButton = new HidableElement(button);
+    const progressBar = new ProgressBar(progress);
+    const progressBarHidable = new HidableElement(progress);
+    const xhr = new XMLHttpRequest();
+
+    xhr.addEventListener("loadstart", () => {
+      submitButton.disable();
+      selectButton.disable();
+      resetButton.disable();
+      statusMessage.update("⏳ Uploading files...");
+      deleteButton.hide();
+      progressBarHidable.show();
+    });
+
+    xhr.upload.addEventListener("progress", (event) => {
+      progressBar.update(event.loaded / event.total);
+    });
+
+    xhr.addEventListener("load", () => {
+      progressBarHidable.hide();
+      resetButton.enable();
+    });
+
+    xhr.addEventListener("loadend", () => {
+      if (xhr.status < 300 && xhr.status >= 200) {
+        resolve(xhr.responseText);
+      } else {
+        reject(xhr.status + "::" + xhr.statusText);
+      }
+    });
+
+    xhr.open(method, url);
+    xhr.setRequestHeader("Content-Type", "multipart/form-data");
+    xhr.send(data);
+  });
+}
+
+async function sendFilesMultiple(files) {
+  const filePromises = [];
+  const progresses = Array.from(
+    filePreviews.pointer.querySelectorAll("progress")
+  );
+  const buttons = Array.from(filePreviews.pointer.querySelectorAll("button"));
+  files.forEach((file, index) => {
+    const data = new FormData();
+    data.append("file", file);
+    filePromises.push(xhrFileUpload(data, progresses[index], buttons[index]));
+  });
+  const results = await Promise.allSettled(filePromises);
+
+  filesToUpload.forEach((file) => {
+    filesToDownload.push(file);
+  });
+  filesToUpload.splice(0);
+  filePreviews.update(
+    filesToDownload.map((file) => file.name + " is ready."),
+    { button: false, bar: false }
+  );
+  statusMessage.update("✅ Success");
+
+  results.forEach((result) => {
+    display.innerText += result.status + " | ";
+  });
 }

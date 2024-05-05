@@ -71,6 +71,7 @@ export class PreviewListInteractive extends PreviewList {
     progressBar.value = 0;
     progressBar.max = 100;
     progressBar.classList.add(`${this.pointer.id}-item-progBar`);
+    progressBar.classList.add(`hidden`);
     element.appendChild(progressBar);
   }
 }
