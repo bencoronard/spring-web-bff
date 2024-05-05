@@ -59,7 +59,6 @@ export class PreviewListInteractive extends PreviewList {
       const index = Array.from(this.pointer.children).indexOf(element);
       this.pointer.removeChild(element);
       this.statePointer.splice(index, 1);
-      console.log("delButton click event triggered");
     });
     element.appendChild(deleteButton);
   }

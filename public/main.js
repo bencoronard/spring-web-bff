@@ -48,8 +48,7 @@ downloadButton.addClickHandle(handleDownload);
 form.addEventListener("submit", handleSubmit);
 form.addEventListener("reset", resetFormState);
 form.addEventListener("change", () => {
-  formJSON.getValues();
-  console.log(filesToUpload);
+  console.log(formJSON.getValues().colorMode);
 });
 
 fileOptions.pointer.addEventListener("keydown", (event) => {
