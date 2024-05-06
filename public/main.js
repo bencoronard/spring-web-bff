@@ -1,3 +1,4 @@
+import { resolve } from "path";
 import {
   StatusText,
   ProgressBar,
@@ -222,7 +223,39 @@ function sendFiles(files) {
   xhr.send(data);
 }
 
-function xhrFileUpload(data, progress, button) {
+async function sendFilesMultiple(files) {
+  const filePromises = [];
+  const progresses = Array.from(
+    filePreviews.pointer.querySelectorAll("progress")
+  );
+  const buttons = Array.from(filePreviews.pointer.querySelectorAll("button"));
+  files.forEach((file, index) => {
+    const data = new FormData();
+    data.append("file", file);
+    filePromises.push(
+      createFileUploadTask(data, progresses[index], buttons[index])
+    );
+  });
+  const results = await Promise.allSettled(filePromises);
+
+  // file polling
+
+  filesToUpload.forEach((file) => {
+    filesToDownload.push(file);
+  });
+  filesToUpload.splice(0);
+  filePreviews.update(
+    filesToDownload.map((file) => file.name + " is ready."),
+    { button: false, bar: false }
+  );
+  statusMessage.update("✅ Success");
+
+  results.forEach((result) => {
+    display.innerText += result.status + " | ";
+  });
+}
+
+function createFileUploadTask(data, progress, button) {
   return new Promise((resolve, reject) => {
     const url = "https://httpbin.org/post";
     const method = "POST";
@@ -263,30 +296,42 @@ function xhrFileUpload(data, progress, button) {
   });
 }
 
-async function sendFilesMultiple(files) {
-  const filePromises = [];
-  const progresses = Array.from(
-    filePreviews.pointer.querySelectorAll("progress")
-  );
-  const buttons = Array.from(filePreviews.pointer.querySelectorAll("button"));
-  files.forEach((file, index) => {
-    const data = new FormData();
-    data.append("file", file);
-    filePromises.push(xhrFileUpload(data, progresses[index], buttons[index]));
-  });
-  const results = await Promise.allSettled(filePromises);
+function createFilePollingTask(data) {
+  return new Promise((resolve, reject) => {
+    const pollInterval = 2000;
+    const pollTimeout = 5 * pollInterval;
+    const url = "https://httpbin.org/post";
+    const method = "GET";
+    const xhr = new XMLHttpRequest();
 
-  filesToUpload.forEach((file) => {
-    filesToDownload.push(file);
-  });
-  filesToUpload.splice(0);
-  filePreviews.update(
-    filesToDownload.map((file) => file.name + " is ready."),
-    { button: false, bar: false }
-  );
-  statusMessage.update("✅ Success");
+    xhr.addEventListener("loadend", () => {
+      if (xhr.status < 300 && xhr.status >= 200) {
+        const fileStatus = JSON.parse(xhr.responseText);
+        if (fileStatus === "DONE") {
+          clearInterval(polling);
+          clearTimeout(timeout);
+          resolve(xhr.responseText);
+        }
+      } else {
+        clearInterval(polling);
+        clearTimeout(timeout);
+        reject(xhr.status + "::" + xhr.statusText);
+      }
+    });
 
-  results.forEach((result) => {
-    display.innerText += result.status + " | ";
+    xhr.open(method, url);
+    xhr.setRequestHeader("Content-Type", "multipart/form-data");
+
+    const timeout = setTimeout(() => {
+      clearInterval(polling);
+      reject("Timed out");
+    }, pollTimeout);
+
+    const polling = setInterval(() => {
+      xhr.send(data);
+    }, pollInterval);
+
+    // setInterval{} send get request periodically
+    // setTimeOut{} clear interval after some time
   });
 }
