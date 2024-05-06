@@ -1,71 +1,68 @@
-import * as components from "./modules/components.js";
-
-//#######################################################################
-//#######################################################################
+import * as components from './modules/components.js';
 
 const filesToUpload = [];
 const filesToDownload = [];
 
-const display = document.getElementById("display");
+const display = document.getElementById('display');
 
 const downloadButton = new components.DynamicButton(
-  document.getElementById("downloadButton")
+  document.getElementById('downloadButton')
 );
 const resetButton = new components.DynamicButton(
-  document.getElementById("resetButton")
+  document.getElementById('resetButton')
 );
 const selectButton = new components.DynamicButton(
-  document.getElementById("selectButton")
+  document.getElementById('selectButton')
 );
 const submitButton = new components.DynamicButton(
-  document.getElementById("submitButton")
+  document.getElementById('submitButton')
 );
 
 const fileDropZone = new components.DropZone(
-  document.getElementById("dropZone"),
+  document.getElementById('dropZone'),
   (event) => {
     handleFileUpload(event.dataTransfer.files);
   }
 );
 
 const filePreviews = new components.PreviewListInteractive(
-  document.getElementById("filePreviews"),
+  document.getElementById('filePreviews'),
   filesToUpload
 );
 
 const statusMessage = new components.StatusText(
-  document.getElementById("statusMessage")
+  document.getElementById('statusMessage')
 );
 const stageList = new components.ChromaticList(
-  document.getElementById("stageList")
+  document.getElementById('stageList')
 );
 
-const formJSON = new components.JsonForm(document.querySelector("form"));
+const formJSON = new components.JsonForm(document.querySelector('form'));
 
-const fileInput = document.getElementById("fileInput");
+const fileInput = document.getElementById('fileInput');
 const fileOptions = new components.HidableElement(
-  document.getElementById("options")
+  document.getElementById('options')
 );
 
 const appStateTracker = new MutationObserver((mutationsList) => {
   for (let mutation of mutationsList) {
-    if (mutation.type === "childList") {
+    if (mutation.type === 'childList') {
       const a = filesToUpload.length > 0 ? 1 : 0;
       const b = filesToDownload.length > 0 ? 1 : 0;
       switch (`${a}${b}`) {
-        case "00":
+        case '00':
           submitButton.disable();
           resetButton.disable();
           stageList.setStage(0);
           fileOptions.hide();
           break;
-        case "10":
+        case '10':
           submitButton.enable();
           resetButton.enable();
           stageList.setStage(1);
           fileOptions.show();
           break;
-        case "01":
+        case '01':
           selectButton.disable();
           submitButton.disable();
           downloadButton.enable();
@@ -86,10 +83,10 @@ selectButton.addClickHandle(() => {
 });
 downloadButton.addClickHandle(handleDownload);
 
-formJSON.pointer.addEventListener("submit", handleSubmit);
-formJSON.pointer.addEventListener("reset", resetAppState);
+formJSON.pointer.addEventListener('submit', handleSubmit);
+formJSON.pointer.addEventListener('reset', resetAppState);
 
-fileInput.addEventListener("change", () => {
+fileInput.addEventListener('change', () => {
   handleFileUpload(fileInput.files);
 });
 
@@ -102,7 +99,7 @@ appStateTracker.observe(filePreviews.pointer, { childList: true });
 function resetAppState() {
   filesToUpload.splice(0);
   filesToDownload.splice(0);
-  fileInput.value = "";
+  fileInput.value = '';
 
   filePreviews.clear();
   selectButton.enable();
@@ -115,10 +112,10 @@ function resetAppState() {
 
   statusMessage.update(`🤷‍♂ Nothing's uploaded`);
 
-  display.innerText = "";
+  display.innerText = '';
 }
 function handleDownload() {
-  console.log("Downloading...");
+  console.log('Downloading...');
 }
 function handleFileUpload(uploadedFiles) {
   try {
@@ -133,7 +130,7 @@ function handleFileUpload(uploadedFiles) {
   submitButton.enable();
 }
 function extractFiles(fileList) {
-  const allowedTypes = ["application/pdf"];
+  const allowedTypes = ['application/pdf'];
   const existingFiles = filesToUpload.map((file) => file.name);
   const invalidFiles = [];
   for (const file of fileList) {
@@ -147,148 +144,58 @@ function extractFiles(fileList) {
   }
   if (invalidFiles.length) {
     throw new Error(
-      `❌ Could not upload following files: ${invalidFiles.join(", ")}`
+      `❌ Could not upload following files: ${invalidFiles.join(', ')}`
     );
   }
 }
 
-function handleSubmit(event) {
+async function handleSubmit(event) {
   event.preventDefault();
 
   // Disable buttons
   submitButton.disable();
+  fileOptions.hide();
   selectButton.disable();
   resetButton.disable();
-  statusMessage.update("⏳ Uploading files...");
-
-  // sendFiles(filesToUpload);
-  // sendFilesMultiple(filesToUpload);
-  sendMultipleFiles(filesToUpload);
-  // sendFilesPromise(filesToUpload);
+  statusMessage.update('⏳ Uploading files...');
+  // Upload
+  await sendFiles(filesToUpload);
 }
 
-function sendFiles(files) {
-  statusMessage.update("⏳ Pending...");
-  const url = "https://filetools13.pdf24.org/client.php?action=upload";
-  const method = "POST";
+async function sendFiles(files) {
+  const progresses = Array.from(
+    filePreviews.pointer.querySelectorAll('progress')
+  );
+  const buttons = Array.from(filePreviews.pointer.querySelectorAll('button'));
 
-  const data = new FormData();
-  for (const file of files) {
-    data.append("file", file);
-  }
-
-  const xhr = new XMLHttpRequest();
-  xhr.open(method, url);
-
-  xhr.addEventListener("loadend", () => {
-    if (xhr.status === 200) {
-      filesToUpload.forEach((file) => {
-        filesToDownload.push(file);
-      });
-      filesToUpload.splice(0);
-      filePreviews.update(
-        filesToDownload.map((file) => file.name + " is ready."),
-        { button: false, bar: false }
-      );
-      statusMessage.update("✅ Success");
-      display.innerText = xhr.responseText;
-    } else {
-      statusMessage.update("❌ Error");
-      display.innerText = "Error:" + xhr.status;
-    }
-  });
-
-  xhr.upload.addEventListener("progress", (event) => {
-    statusMessage.update(`⏳ Uploaded ${event.loaded} bytes of ${event.total}`);
-  });
-
-  xhr.send(data);
-}
-
-async function sendFilesPromise(files) {
   const filePromises = [];
-
-  // const progresses = Array.from(
-  //   filePreviews.pointer.querySelectorAll("progress")
-  // );
-  // const buttons = Array.from(filePreviews.pointer.querySelectorAll("button"));
-  // files.forEach((file, index) => {
-  //   filePromises.push(
-  //     createFileUploadTask(file, progresses[index], buttons[index])
-  //   );
-  // });
-
-  files.forEach((file) => {
+  files.forEach((file, index) => {
     filePromises.push(
-      new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        const formData = new FormData();
-        formData.append("file", file);
-        xhr.open(
-          "POST",
-          "https://filetools13.pdf24.org/client.php?action=upload"
-        );
-
-        // Handle the response
-        xhr.onload = function () {
-          if (xhr.status === 200) {
-            // display.innerText += xhr.responseText;
-            resolve(xhr.responseText);
-          } else {
-            // display.innerText += "Error:" + xhr.status;
-            reject("Error:" + xhr.status);
-          }
-        };
-
-        // Handle network errors
-        xhr.onerror = function () {
-          reject("Network error while uploading file:", file.name);
-        };
-
-        xhr.send(formData);
-      })
+      createFileUploadTask(file, progresses[index], buttons[index])
     );
   });
 
   const responses = await Promise.allSettled(filePromises);
 
-  responses.forEach((response) => {
-    if (response.status === "fulfilled") {
-      display.innerText += response.value;
-    } else {
-      display.innerText += response.reason;
-    }
+  // Handle app state change
+  filesToUpload.forEach((file) => {
+    filesToDownload.push(file);
   });
-}
+  filesToUpload.splice(0);
+  filePreviews.update(
+    filesToDownload.map((file) => file.name + ' is ready.'),
+    { button: false, bar: false }
+  );
+  statusMessage.update('✅ Success');
+  resetButton.enable();
 
-function sendMultipleFiles(files) {
-  // Iterate through each file in the array
-  files.forEach((file) => {
-    const xhr = new XMLHttpRequest();
-    const formData = new FormData();
-
-    // Add the file to FormData
-    formData.append("file", file);
-
-    // Configure the XMLHttpRequest
-    xhr.open("POST", "https://filetools13.pdf24.org/client.php?action=upload");
-
-    // Handle the response
-    xhr.onload = function () {
-      if (xhr.status === 200) {
-        display.innerText += xhr.responseText;
-      } else {
-        display.innerText += "Error:" + xhr.status;
-      }
-    };
-
-    // Handle network errors
-    xhr.onerror = function () {
-      console.error("Network error while uploading file:", file.name);
-    };
-
-    // Send the request
-    xhr.send(formData);
+  // Log response
+  responses.forEach((response) => {
+    if (response.status === 'fulfilled') {
+      display.innerText += response.value + '\n';
+    } else {
+      display.innerText += response.reason + '\n';
+    }
   });
 }
 
@@ -298,15 +205,15 @@ function createFileUploadTask(data, progress, button) {
     const progressBar = new components.ProgressBar(progress);
     const progressBarHidable = new components.HidableElement(progress);
 
-    const url = "https://httpbin.org/post";
-    const method = "POST";
+    const url = 'https://filetools13.pdf24.org/client.php?action=upload';
+    const method = 'POST';
     const xhr = new XMLHttpRequest();
 
     const formData = new FormData();
     // Add the file to FormData
-    formData.append("file", file);
+    formData.append('file', data);
 
-    // Configure the XMLHttpRequest
+    // Configure XMLHttpRequest
     xhr.open(method, url);
 
     xhr.onloadstart = () => {
@@ -326,57 +233,18 @@ function createFileUploadTask(data, progress, button) {
       if (xhr.status === 200) {
         resolve(xhr.responseText);
       } else {
-        reject("Error:" + xhr.status);
+        reject('Error:' + xhr.status);
       }
     };
 
     xhr.onerror = () => {
-      reject("Network error while uploading file:", file.name);
+      reject('Network error while uploading file:', file.name);
     };
 
-    // Send the request
+    // Send request
     xhr.send(formData);
   });
 }
-
-// async function sendFilesMultiple(files) {
-//   const filePromises = [];
-//   const progresses = Array.from(
-//     filePreviews.pointer.querySelectorAll("progress")
-//   );
-//   const buttons = Array.from(filePreviews.pointer.querySelectorAll("button"));
-
-//   const formData = new FormData();
-//   for (const file of files) {
-//     formData.append("file", file);
-//   }
-//   console.log(formData);
-
-//   files.forEach((file, index) => {
-//     const data = new FormData();
-//     data.append('file', file);
-//     console.log(data);
-//     // filePromises.push(
-//     //   createFileUploadTask(data, progresses[index], buttons[index])
-//     // );
-//   });
-
-//   const results = await Promise.allSettled(filePromises);
-
-//   filesToUpload.forEach((file) => {
-//     filesToDownload.push(file);
-//   });
-//   filesToUpload.splice(0);
-//   filePreviews.update(
-//     filesToDownload.map((file) => file.name + ' is ready.'),
-//     { button: false, bar: false }
-//   );
-//   statusMessage.update('✅ Success');
-
-//   results.forEach((result) => {
-//     display.innerText += result.status + ' | ';
-//   });
-// }
 
 // function createFilePollingTask(data) {
 //   return new Promise((resolve, reject) => {
