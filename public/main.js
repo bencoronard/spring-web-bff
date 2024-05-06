@@ -1,4 +1,3 @@
-import { resolve } from "path";
 import {
   StatusText,
   ProgressBar,
@@ -8,51 +7,51 @@ import {
   ChromaticList,
   HidableElement,
   JsonForm,
-} from "./modules/components.js";
+} from './modules/components.js';
 
-const display = document.getElementById("display");
+const display = document.getElementById('display');
 
 const filesToUpload = [];
 const filesToDownload = [];
 
 const downloadButton = new DynamicButton(
-  document.getElementById("downloadButton")
+  document.getElementById('downloadButton')
 );
-const resetButton = new DynamicButton(document.getElementById("resetButton"));
-const selectButton = new DynamicButton(document.getElementById("selectButton"));
-const submitButton = new DynamicButton(document.getElementById("submitButton"));
+const resetButton = new DynamicButton(document.getElementById('resetButton'));
+const selectButton = new DynamicButton(document.getElementById('selectButton'));
+const submitButton = new DynamicButton(document.getElementById('submitButton'));
 
 const fileDropZone = new DropZone(
-  document.getElementById("dropZone"),
+  document.getElementById('dropZone'),
   (event) => {
     handleFileUpload(event.dataTransfer.files);
   }
 );
 const filePreviews = new PreviewListInteractive(
-  document.getElementById("filePreviews"),
+  document.getElementById('filePreviews'),
   filesToUpload
 );
 
-const statusMessage = new StatusText(document.getElementById("statusMessage"));
-const stageList = new ChromaticList(document.getElementById("stageList"));
+const statusMessage = new StatusText(document.getElementById('statusMessage'));
+const stageList = new ChromaticList(document.getElementById('stageList'));
 
-const formJSON = new JsonForm(document.querySelector("form"));
+const formJSON = new JsonForm(document.querySelector('form'));
 
-const fileInput = document.getElementById("fileInput");
-const fileOptions = new HidableElement(document.getElementById("options"));
+const fileInput = document.getElementById('fileInput');
+const fileOptions = new HidableElement(document.getElementById('options'));
 
 selectButton.addClickHandle(() => {
   fileInput.click();
 });
 downloadButton.addClickHandle(handleDownload);
 
-formJSON.pointer.addEventListener("submit", handleSubmit);
-formJSON.pointer.addEventListener("reset", resetAppState);
+formJSON.pointer.addEventListener('submit', handleSubmit);
+formJSON.pointer.addEventListener('reset', resetAppState);
 // formJSON.pointer.addEventListener("change", () => {
 //   console.log(formJSON.getValues());
 // });
 
-fileInput.addEventListener("change", () => {
+fileInput.addEventListener('change', () => {
   handleFileUpload(fileInput.files);
 });
 
@@ -60,23 +59,23 @@ resetAppState();
 
 const appStateTracker = new MutationObserver((mutationsList) => {
   for (let mutation of mutationsList) {
-    if (mutation.type === "childList") {
+    if (mutation.type === 'childList') {
       const a = filesToUpload.length > 0 ? 1 : 0;
       const b = filesToDownload.length > 0 ? 1 : 0;
       switch (`${a}${b}`) {
-        case "00":
+        case '00':
           submitButton.disable();
           resetButton.disable();
           stageList.setStage(0);
           fileOptions.hide();
           break;
-        case "10":
+        case '10':
           submitButton.enable();
           resetButton.enable();
           stageList.setStage(1);
           fileOptions.show();
           break;
-        case "01":
+        case '01':
           selectButton.disable();
           submitButton.disable();
           downloadButton.enable();
@@ -94,7 +93,7 @@ appStateTracker.observe(filePreviews.pointer, { childList: true });
 function resetAppState() {
   filesToUpload.splice(0);
   filesToDownload.splice(0);
-  fileInput.value = "";
+  fileInput.value = '';
 
   filePreviews.clear();
   selectButton.enable();
@@ -107,7 +106,7 @@ function resetAppState() {
 
   statusMessage.update(`🤷‍♂ Nothing's uploaded`);
 
-  display.innerText = "";
+  display.innerText = '';
 }
 
 function handleFileUpload(uploadedFiles) {
@@ -124,7 +123,7 @@ function handleFileUpload(uploadedFiles) {
 }
 
 function handleDownload() {
-  console.log("Downloading...");
+  console.log('Downloading...');
 }
 
 function handleSubmit(event) {
@@ -136,7 +135,7 @@ function handleSubmit(event) {
 }
 
 function extractFiles(fileList) {
-  const allowedTypes = ["application/pdf"];
+  const allowedTypes = ['application/pdf'];
   const existingFiles = filesToUpload.map((file) => file.name);
   const invalidFiles = [];
   for (const file of fileList) {
@@ -150,7 +149,7 @@ function extractFiles(fileList) {
   }
   if (invalidFiles.length) {
     throw new Error(
-      `❌ Could not upload following files: ${invalidFiles.join(", ")}`
+      `❌ Could not upload following files: ${invalidFiles.join(', ')}`
     );
   }
 }
@@ -158,7 +157,7 @@ function extractFiles(fileList) {
 function mockSending(filesToUpload) {
   submitButton.disable();
   fileOptions.hide();
-  statusMessage.update("⏳ Uploading...");
+  statusMessage.update('⏳ Uploading...');
 
   let progress = 0;
 
@@ -168,12 +167,12 @@ function mockSending(filesToUpload) {
     });
     filesToUpload.splice(0);
 
-    statusMessage.update("✅ Success");
+    statusMessage.update('✅ Success');
     progressBar.update(0);
     submitButton.enable();
 
     filePreviews.update(
-      filesToDownload.map((file) => file.name + " is ready."),
+      filesToDownload.map((file) => file.name + ' is ready.'),
       { button: false, bar: false }
     );
 
@@ -187,34 +186,34 @@ function mockSending(filesToUpload) {
 }
 
 function sendFiles(files) {
-  statusMessage.update("⏳ Pending...");
-  const url = "https://httpbin.org/post";
-  const method = "POST";
+  statusMessage.update('⏳ Pending...');
+  const url = 'https://httpbin.org/post';
+  const method = 'POST';
   const xhr = new XMLHttpRequest();
 
   const data = new FormData();
   for (const file of files) {
-    data.append("file", file);
+    data.append('file', file);
   }
 
-  xhr.addEventListener("loadend", () => {
+  xhr.addEventListener('loadend', () => {
     if (xhr.status === 200) {
       filesToUpload.forEach((file) => {
         filesToDownload.push(file);
       });
       filesToUpload.splice(0);
       filePreviews.update(
-        filesToDownload.map((file) => file.name + " is ready."),
+        filesToDownload.map((file) => file.name + ' is ready.'),
         { button: false, bar: false }
       );
-      statusMessage.update("✅ Success");
+      statusMessage.update('✅ Success');
     } else {
-      statusMessage.update("❌ Error");
+      statusMessage.update('❌ Error');
     }
     progressBar.update(0);
   });
 
-  xhr.upload.addEventListener("progress", (event) => {
+  xhr.upload.addEventListener('progress', (event) => {
     statusMessage.update(`⏳ Uploaded ${event.loaded} bytes of ${event.total}`);
     progressBar.update(event.loaded / event.total);
   });
@@ -226,12 +225,12 @@ function sendFiles(files) {
 async function sendFilesMultiple(files) {
   const filePromises = [];
   const progresses = Array.from(
-    filePreviews.pointer.querySelectorAll("progress")
+    filePreviews.pointer.querySelectorAll('progress')
   );
-  const buttons = Array.from(filePreviews.pointer.querySelectorAll("button"));
+  const buttons = Array.from(filePreviews.pointer.querySelectorAll('button'));
   files.forEach((file, index) => {
     const data = new FormData();
-    data.append("file", file);
+    data.append('file', file);
     filePromises.push(
       createFileUploadTask(data, progresses[index], buttons[index])
     );
@@ -245,53 +244,53 @@ async function sendFilesMultiple(files) {
   });
   filesToUpload.splice(0);
   filePreviews.update(
-    filesToDownload.map((file) => file.name + " is ready."),
+    filesToDownload.map((file) => file.name + ' is ready.'),
     { button: false, bar: false }
   );
-  statusMessage.update("✅ Success");
+  statusMessage.update('✅ Success');
 
   results.forEach((result) => {
-    display.innerText += result.status + " | ";
+    display.innerText += result.status + ' | ';
   });
 }
 
 function createFileUploadTask(data, progress, button) {
   return new Promise((resolve, reject) => {
-    const url = "https://httpbin.org/post";
-    const method = "POST";
+    const url = 'https://httpbin.org/post';
+    const method = 'POST';
     const deleteButton = new HidableElement(button);
     const progressBar = new ProgressBar(progress);
     const progressBarHidable = new HidableElement(progress);
     const xhr = new XMLHttpRequest();
 
-    xhr.addEventListener("loadstart", () => {
+    xhr.addEventListener('loadstart', () => {
       submitButton.disable();
       selectButton.disable();
       resetButton.disable();
-      statusMessage.update("⏳ Uploading files...");
+      statusMessage.update('⏳ Uploading files...');
       deleteButton.hide();
       progressBarHidable.show();
     });
 
-    xhr.upload.addEventListener("progress", (event) => {
+    xhr.upload.addEventListener('progress', (event) => {
       progressBar.update(event.loaded / event.total);
     });
 
-    xhr.addEventListener("load", () => {
+    xhr.addEventListener('load', () => {
       progressBarHidable.hide();
       resetButton.enable();
     });
 
-    xhr.addEventListener("loadend", () => {
+    xhr.addEventListener('loadend', () => {
       if (xhr.status < 300 && xhr.status >= 200) {
         resolve(xhr.responseText);
       } else {
-        reject(xhr.status + "::" + xhr.statusText);
+        reject(xhr.status + '::' + xhr.statusText);
       }
     });
 
     xhr.open(method, url);
-    xhr.setRequestHeader("Content-Type", "multipart/form-data");
+    xhr.setRequestHeader('Content-Type', 'multipart/form-data');
     xhr.send(data);
   });
 }
@@ -300,14 +299,14 @@ function createFilePollingTask(data) {
   return new Promise((resolve, reject) => {
     const pollInterval = 2000;
     const pollTimeout = 5 * pollInterval;
-    const url = "https://httpbin.org/post";
-    const method = "GET";
+    const url = 'https://httpbin.org/post';
+    const method = 'GET';
     const xhr = new XMLHttpRequest();
 
-    xhr.addEventListener("loadend", () => {
+    xhr.addEventListener('loadend', () => {
       if (xhr.status < 300 && xhr.status >= 200) {
         const fileStatus = JSON.parse(xhr.responseText);
-        if (fileStatus === "DONE") {
+        if (fileStatus === 'DONE') {
           clearInterval(polling);
           clearTimeout(timeout);
           resolve(xhr.responseText);
@@ -315,16 +314,16 @@ function createFilePollingTask(data) {
       } else {
         clearInterval(polling);
         clearTimeout(timeout);
-        reject(xhr.status + "::" + xhr.statusText);
+        reject(xhr.status + '::' + xhr.statusText);
       }
     });
 
     xhr.open(method, url);
-    xhr.setRequestHeader("Content-Type", "multipart/form-data");
+    xhr.setRequestHeader('Content-Type', 'multipart/form-data');
 
     const timeout = setTimeout(() => {
       clearInterval(polling);
-      reject("Timed out");
+      reject('Timed out');
     }, pollTimeout);
 
     const polling = setInterval(() => {
