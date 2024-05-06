@@ -119,3 +119,9 @@ body {
   border: 2px solid green;
   max-width: 1200px;
 }
+.success {
+  color: green;
+}
+.failure {
+  color: purple;
+}
