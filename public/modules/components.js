@@ -9,7 +9,7 @@ export class DynamicButton {
     this.pointer.disabled = true;
   }
   addClickHandle(handle) {
-    this.pointer.addEventListener("click", handle);
+    this.pointer.addEventListener('click', handle);
   }
 }
 
@@ -20,14 +20,14 @@ export class PreviewList {
   update(items) {
     this.clear();
     items.forEach((item) => {
-      const li = document.createElement("li");
+      const li = document.createElement('li');
       li.classList.add(`${this.pointer.id}-item`);
       li.textContent = item;
       this.pointer.appendChild(li);
     });
   }
   clear() {
-    this.pointer.innerHTML = "";
+    this.pointer.innerHTML = '';
   }
 }
 
@@ -40,27 +40,39 @@ export class PreviewListInteractive extends PreviewList {
   update(items, option) {
     this.clear();
     items.forEach((item) => {
-      const li = document.createElement("li");
+      const li = document.createElement('li');
       li.classList.add(`${this.pointer.id}-item`);
       li.textContent = item;
       this.pointer.appendChild(li);
-      if (option) {
+      if (option.bar) {
+        this.addProgressBar(li);
+      }
+      if (option.button) {
         this.addButton(li);
       }
     });
   }
 
   addButton(element) {
-    const deleteButton = document.createElement("button");
-    deleteButton.type = "button";
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
     deleteButton.classList.add(`${this.pointer.id}-item-delBtn`);
-    deleteButton.textContent = "x";
-    deleteButton.addEventListener("click", () => {
+    deleteButton.textContent = 'x';
+    deleteButton.addEventListener('click', () => {
       const index = Array.from(this.pointer.children).indexOf(element);
       this.pointer.removeChild(element);
       this.statePointer.splice(index, 1);
     });
     element.appendChild(deleteButton);
+  }
+
+  addProgressBar(element) {
+    const progressBar = document.createElement('progress');
+    progressBar.value = 0;
+    progressBar.max = 100;
+    progressBar.classList.add(`${this.pointer.id}-item-progBar`);
+    progressBar.classList.add(`hidden`);
+    element.appendChild(progressBar);
   }
 }
 
@@ -89,21 +101,21 @@ export class DropZone {
   }
 
   enable() {
-    this.pointer.classList.remove("lowlight");
+    this.pointer.classList.remove('lowlight');
 
     let dragEventCounter = 0;
 
-    this.pointer.addEventListener("dragenter", (event) => {
+    this.pointer.addEventListener('dragenter', (event) => {
       event.preventDefault();
 
       if (dragEventCounter === 0) {
-        this.pointer.classList.add("highlight");
+        this.pointer.classList.add('highlight');
       }
 
       dragEventCounter += 1;
     });
 
-    this.pointer.addEventListener("dragover", (event) => {
+    this.pointer.addEventListener('dragover', (event) => {
       event.preventDefault();
 
       if (dragEventCounter === 0) {
@@ -111,30 +123,30 @@ export class DropZone {
       }
     });
 
-    this.pointer.addEventListener("dragleave", (event) => {
+    this.pointer.addEventListener('dragleave', (event) => {
       event.preventDefault();
 
       dragEventCounter -= 1;
 
       if (dragEventCounter <= 0) {
         dragEventCounter = 0;
-        this.pointer.classList.remove("highlight");
+        this.pointer.classList.remove('highlight');
       }
     });
 
-    this.pointer.addEventListener("drop", (event) => {
+    this.pointer.addEventListener('drop', (event) => {
       event.preventDefault();
 
       dragEventCounter = 0;
-      this.pointer.classList.remove("highlight");
+      this.pointer.classList.remove('highlight');
     });
 
-    this.pointer.addEventListener("drop", this.dropHandle);
+    this.pointer.addEventListener('drop', this.dropHandle);
   }
 
   disable() {
-    this.pointer.removeEventListener("drop", this.dropHandle);
-    this.pointer.classList.add("lowlight");
+    this.pointer.removeEventListener('drop', this.dropHandle);
+    this.pointer.classList.add('lowlight');
   }
 }
 
@@ -147,10 +159,10 @@ export class ChromaticList {
   }
 
   addColor(index) {
-    this.pointer.children[index].classList.add("colored");
+    this.pointer.children[index].classList.add('colored');
   }
   removeColor(index) {
-    this.pointer.children[index].classList.remove("colored");
+    this.pointer.children[index].classList.remove('colored');
   }
 
   setStage(stage) {
@@ -176,14 +188,14 @@ export class HidableElement {
   }
 
   hide() {
-    if (!this.pointer.classList.contains("hidden")) {
-      this.pointer.classList.add("hidden");
+    if (!this.pointer.classList.contains('hidden')) {
+      this.pointer.classList.add('hidden');
     }
   }
 
   show() {
-    if (this.pointer.classList.contains("hidden")) {
-      this.pointer.classList.remove("hidden");
+    if (this.pointer.classList.contains('hidden')) {
+      this.pointer.classList.remove('hidden');
     }
   }
 }
@@ -191,17 +203,17 @@ export class HidableElement {
 export class JsonForm {
   constructor(htmlElement) {
     this.pointer = htmlElement;
-    this.inputs = htmlElement.querySelectorAll("input");
+    this.inputs = htmlElement.querySelectorAll('input');
     this.init();
   }
 
   init() {
     this.inputs.forEach((input, index) => {
-      input.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
+      input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
           event.preventDefault();
 
-          if (input.type === "checkbox") {
+          if (input.type === 'checkbox') {
             input.checked = !input.checked;
           }
 
@@ -223,7 +235,7 @@ export class JsonForm {
     const formValues = {};
     this.inputs.forEach((input) => {
       formValues[input.name] =
-        input.type === "checkbox" ? input.checked : input.value;
+        input.type === 'checkbox' ? input.checked : input.value;
     });
     return formValues;
   }
