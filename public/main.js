@@ -1,61 +1,51 @@
-import {
-  StatusText,
-  ProgressBar,
-  DynamicButton,
-  DropZone,
-  PreviewListInteractive,
-  ChromaticList,
-  HidableElement,
-  JsonForm,
-} from './modules/components.js';
+import * as components from './modules/components.js';
 
-const display = document.getElementById('display');
+//#######################################################################
+//#######################################################################
 
 const filesToUpload = [];
 const filesToDownload = [];
 
-const downloadButton = new DynamicButton(
+const display = document.getElementById('display');
+
+const downloadButton = new components.DynamicButton(
   document.getElementById('downloadButton')
 );
-const resetButton = new DynamicButton(document.getElementById('resetButton'));
-const selectButton = new DynamicButton(document.getElementById('selectButton'));
-const submitButton = new DynamicButton(document.getElementById('submitButton'));
+const resetButton = new components.DynamicButton(
+  document.getElementById('resetButton')
+);
+const selectButton = new components.DynamicButton(
+  document.getElementById('selectButton')
+);
+const submitButton = new components.DynamicButton(
+  document.getElementById('submitButton')
+);
 
-const fileDropZone = new DropZone(
+const fileDropZone = new components.DropZone(
   document.getElementById('dropZone'),
   (event) => {
     handleFileUpload(event.dataTransfer.files);
   }
 );
-const filePreviews = new PreviewListInteractive(
+
+const filePreviews = new components.PreviewListInteractive(
   document.getElementById('filePreviews'),
   filesToUpload
 );
 
-const statusMessage = new StatusText(document.getElementById('statusMessage'));
-const stageList = new ChromaticList(document.getElementById('stageList'));
+const statusMessage = new components.StatusText(
+  document.getElementById('statusMessage')
+);
+const stageList = new components.ChromaticList(
+  document.getElementById('stageList')
+);
 
-const formJSON = new JsonForm(document.querySelector('form'));
+const formJSON = new components.JsonForm(document.querySelector('form'));
 
 const fileInput = document.getElementById('fileInput');
-const fileOptions = new HidableElement(document.getElementById('options'));
-
-selectButton.addClickHandle(() => {
-  fileInput.click();
-});
-downloadButton.addClickHandle(handleDownload);
-
-formJSON.pointer.addEventListener('submit', handleSubmit);
-formJSON.pointer.addEventListener('reset', resetAppState);
-// formJSON.pointer.addEventListener("change", () => {
-//   console.log(formJSON.getValues());
-// });
-
-fileInput.addEventListener('change', () => {
-  handleFileUpload(fileInput.files);
-});
-
-resetAppState();
+const fileOptions = new components.HidableElement(
+  document.getElementById('options')
+);
 
 const appStateTracker = new MutationObserver((mutationsList) => {
   for (let mutation of mutationsList) {
@@ -87,9 +77,28 @@ const appStateTracker = new MutationObserver((mutationsList) => {
     }
   }
 });
+
+//#######################################################################
+//#######################################################################
+
+selectButton.addClickHandle(() => {
+  fileInput.click();
+});
+downloadButton.addClickHandle(handleDownload);
+
+formJSON.pointer.addEventListener('submit', handleSubmit);
+formJSON.pointer.addEventListener('reset', resetAppState);
+
+fileInput.addEventListener('change', () => {
+  handleFileUpload(fileInput.files);
+});
+
+resetAppState();
+
 appStateTracker.observe(filePreviews.pointer, { childList: true });
 
-// Functions
+//#######################################################################
+//#######################################################################
 function resetAppState() {
   filesToUpload.splice(0);
   filesToDownload.splice(0);
@@ -108,7 +117,9 @@ function resetAppState() {
 
   display.innerText = '';
 }
-
+function handleDownload() {
+  console.log('Downloading...');
+}
 function handleFileUpload(uploadedFiles) {
   try {
     extractFiles(uploadedFiles);
@@ -121,19 +132,6 @@ function handleFileUpload(uploadedFiles) {
   );
   submitButton.enable();
 }
-
-function handleDownload() {
-  console.log('Downloading...');
-}
-
-function handleSubmit(event) {
-  event.preventDefault();
-
-  // sendFiles(filesToUpload);
-  sendFilesMultiple(filesToUpload);
-  // mockSending(filesToUpload);
-}
-
 function extractFiles(fileList) {
   const allowedTypes = ['application/pdf'];
   const existingFiles = filesToUpload.map((file) => file.name);
@@ -154,47 +152,26 @@ function extractFiles(fileList) {
   }
 }
 
-function mockSending(filesToUpload) {
-  submitButton.disable();
-  fileOptions.hide();
-  statusMessage.update('⏳ Uploading...');
+function handleSubmit(event) {
+  event.preventDefault();
 
-  let progress = 0;
-
-  setTimeout(() => {
-    filesToUpload.forEach((file) => {
-      filesToDownload.push(file);
-    });
-    filesToUpload.splice(0);
-
-    statusMessage.update('✅ Success');
-    progressBar.update(0);
-    submitButton.enable();
-
-    filePreviews.update(
-      filesToDownload.map((file) => file.name + ' is ready.'),
-      { button: false, bar: false }
-    );
-
-    clearInterval(progressBarUpdateTimer);
-  }, 3250);
-
-  const progressBarUpdateTimer = setInterval(() => {
-    progress += 0.35;
-    progressBar.update(progress);
-  }, 1000);
+  // sendFiles(filesToUpload);
+  sendMultipleFiles(filesToUpload);
+  // sendFilesMultiple(filesToUpload);
 }
 
 function sendFiles(files) {
   statusMessage.update('⏳ Pending...');
-  const url = 'https://httpbin.org/post';
+  const url = 'https://filetools13.pdf24.org/client.php?action=upload';
   const method = 'POST';
-  const xhr = new XMLHttpRequest();
 
   const data = new FormData();
   for (const file of files) {
     data.append('file', file);
   }
+
+  const xhr = new XMLHttpRequest();
+  xhr.open(method, url);
 
   xhr.addEventListener('loadend', () => {
     if (xhr.status === 200) {
@@ -207,18 +184,17 @@ function sendFiles(files) {
         { button: false, bar: false }
       );
       statusMessage.update('✅ Success');
+      display.innerText = xhr.responseText;
     } else {
       statusMessage.update('❌ Error');
+      display.innerText = 'Error:' + xhr.status;
     }
-    progressBar.update(0);
   });
 
   xhr.upload.addEventListener('progress', (event) => {
     statusMessage.update(`⏳ Uploaded ${event.loaded} bytes of ${event.total}`);
-    progressBar.update(event.loaded / event.total);
   });
 
-  xhr.open(method, url);
   xhr.send(data);
 }
 
@@ -228,29 +204,68 @@ async function sendFilesMultiple(files) {
     filePreviews.pointer.querySelectorAll('progress')
   );
   const buttons = Array.from(filePreviews.pointer.querySelectorAll('button'));
-  files.forEach((file, index) => {
-    const data = new FormData();
-    data.append('file', file);
-    filePromises.push(
-      createFileUploadTask(data, progresses[index], buttons[index])
-    );
-  });
-  const results = await Promise.allSettled(filePromises);
 
-  // file polling
+  const formData = new FormData();
+  for (const file of files) {
+    formData.append('file', file);
+  }
+  console.log(formData);
 
-  filesToUpload.forEach((file) => {
-    filesToDownload.push(file);
-  });
-  filesToUpload.splice(0);
-  filePreviews.update(
-    filesToDownload.map((file) => file.name + ' is ready.'),
-    { button: false, bar: false }
-  );
-  statusMessage.update('✅ Success');
+  // files.forEach((file, index) => {
+  //   const data = new FormData();
+  //   data.append('file', file);
+  //   console.log(data);
+  //   // filePromises.push(
+  //   //   createFileUploadTask(data, progresses[index], buttons[index])
+  //   // );
+  // });
 
-  results.forEach((result) => {
-    display.innerText += result.status + ' | ';
+  // const results = await Promise.allSettled(filePromises);
+
+  // filesToUpload.forEach((file) => {
+  //   filesToDownload.push(file);
+  // });
+  // filesToUpload.splice(0);
+  // filePreviews.update(
+  //   filesToDownload.map((file) => file.name + ' is ready.'),
+  //   { button: false, bar: false }
+  // );
+  // statusMessage.update('✅ Success');
+
+  // results.forEach((result) => {
+  //   display.innerText += result.status + ' | ';
+  // });
+}
+
+function sendMultipleFiles(files) {
+  // Iterate through each file in the array
+  files.forEach((file) => {
+    console.log(file.name);
+    const xhr = new XMLHttpRequest();
+    const formData = new FormData();
+
+    // Add the file to FormData
+    formData.append('file', file);
+
+    // Configure the XMLHttpRequest
+    xhr.open('POST', 'https://filetools13.pdf24.org/client.php?action=upload');
+
+    // Handle the response
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        display.innerText += xhr.responseText;
+      } else {
+        display.innerText += 'Error:' + xhr.status;
+      }
+    };
+
+    // Handle network errors
+    xhr.onerror = function () {
+      console.error('Network error while uploading file:', file.name);
+    };
+
+    // Send the request
+    xhr.send(formData);
   });
 }
 
@@ -258,9 +273,9 @@ function createFileUploadTask(data, progress, button) {
   return new Promise((resolve, reject) => {
     const url = 'https://httpbin.org/post';
     const method = 'POST';
-    const deleteButton = new HidableElement(button);
-    const progressBar = new ProgressBar(progress);
-    const progressBarHidable = new HidableElement(progress);
+    const deleteButton = new components.HidableElement(button);
+    const progressBar = new components.ProgressBar(progress);
+    const progressBarHidable = new components.HidableElement(progress);
     const xhr = new XMLHttpRequest();
 
     xhr.addEventListener('loadstart', () => {
@@ -290,7 +305,6 @@ function createFileUploadTask(data, progress, button) {
     });
 
     xhr.open(method, url);
-    xhr.setRequestHeader('Content-Type', 'multipart/form-data');
     xhr.send(data);
   });
 }
@@ -329,8 +343,5 @@ function createFilePollingTask(data) {
     const polling = setInterval(() => {
       xhr.send(data);
     }, pollInterval);
-
-    // setInterval{} send get request periodically
-    // setTimeOut{} clear interval after some time
   });
 }
