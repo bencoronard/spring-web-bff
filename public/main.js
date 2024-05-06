@@ -160,6 +160,7 @@ async function handleSubmit(event) {
   statusMessage.update('⏳ Uploading files...');
   // Upload
   await sendFiles(filesToUpload);
+  // await pollFiles();
 }
 
 async function sendFiles(files) {
@@ -198,7 +199,7 @@ async function sendFiles(files) {
     }
   });
 }
-
+//#######################################################################
 function createFileUploadTask(data, progress, button) {
   return new Promise((resolve, reject) => {
     const deleteButton = new components.HidableElement(button);
