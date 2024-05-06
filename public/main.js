@@ -153,6 +153,7 @@ function extractFiles(fileList) {
 }
 
 function handleSubmit(event) {
+  submitButton.disable();
   event.preventDefault();
 
   // sendFiles(filesToUpload);
@@ -240,7 +241,6 @@ async function sendFilesMultiple(files) {
 function sendMultipleFiles(files) {
   // Iterate through each file in the array
   files.forEach((file) => {
-    console.log(file.name);
     const xhr = new XMLHttpRequest();
     const formData = new FormData();
 
