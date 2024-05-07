@@ -73,8 +73,8 @@
 
           <div id="slide-switch" class="wrapper">
             <span>Color</span>
-            <input type="checkbox" name="grayScale" />
-            <label for="colorMode"></label>
+            <input type="checkbox" id="colorSwitch" name="grayScale" />
+            <label for="colorSwitch"></label>
             <span>Gray</span>
           </div>
         </div>
@@ -83,7 +83,10 @@
       <button id="submitButton" type="submit">Compress</button>
     </form>
 
-    <div id="display"></div>
+    <div id="display">
+      <div class="success"></div>
+      <div class="failure"></div>
+    </div>
 
     <script type="module" src="main.js"></script>
   </body>

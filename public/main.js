@@ -2,8 +2,11 @@ import * as components from './modules/components.js';
 
 const filesToUpload = [];
 const filesToDownload = [];
+const filesNotCompleted = [];
 
 const display = document.getElementById('display');
+const success = display.querySelector('.success');
+const failure = display.querySelector('.failure');
 
 const downloadButton = new components.DynamicButton(
   document.getElementById('downloadButton')
@@ -76,6 +79,7 @@ const appStateTracker = new MutationObserver((mutationsList) => {
 });
 
 //#######################################################################
+//###################     INITIALIZATIONS    ############################
 //#######################################################################
 
 selectButton.addClickHandle(() => {
@@ -95,6 +99,7 @@ resetAppState();
 appStateTracker.observe(filePreviews.pointer, { childList: true });
 
 //#######################################################################
+//###################      APP STATE FUNCTIONS      #####################
 //#######################################################################
 function resetAppState() {
   filesToUpload.splice(0);
@@ -112,7 +117,8 @@ function resetAppState() {
 
   statusMessage.update(`🤷‍♂ Nothing's uploaded`);
 
-  display.innerText = '';
+  success.innerText = '';
+  failure.innerText = '';
 }
 function handleDownload() {
   console.log('Downloading...');
@@ -120,12 +126,13 @@ function handleDownload() {
 function handleFileUpload(uploadedFiles) {
   try {
     extractFiles(uploadedFiles);
-  } catch (err) {
-    statusMessage.update(err.message);
+  } catch (error) {
+    statusMessage.update(error.message);
   }
+  // Initialize uploaded file previews
   filePreviews.update(
     filesToUpload.map((file) => file.name),
-    { button: true, bar: true }
+    { button: true, bar: true, text: true }
   );
   submitButton.enable();
 }
@@ -158,60 +165,102 @@ async function handleSubmit(event) {
   selectButton.disable();
   resetButton.disable();
   statusMessage.update('⏳ Uploading files...');
+
   // Upload
-  await sendFiles(filesToUpload);
+  const tasksToPoll = await sendFiles(filesToUpload);
+
+  // Render file downloads
+  filePreviews.update(filesToDownload, {
+    button: false,
+    bar: false,
+    text: true,
+  });
+  statusMessage.update('✅ Files uploaded');
+
+  const tasksCompleted = await pollFiles(tasksToPoll);
+
+  statusMessage.update('🚀 Files available to download');
+
+  resetButton.enable();
 }
+
+//#######################################################################
+//##################       NETWORK FUNCTIONS      #######################
+//#######################################################################
 
 async function sendFiles(files) {
   const progresses = Array.from(
     filePreviews.pointer.querySelectorAll('progress')
   );
   const buttons = Array.from(filePreviews.pointer.querySelectorAll('button'));
+  const statuses = Array.from(filePreviews.pointer.querySelectorAll('span'));
 
-  const filePromises = [];
+  const uploadTasks = [];
+  const tasksToPoll = [];
+
   files.forEach((file, index) => {
-    filePromises.push(
-      createFileUploadTask(file, progresses[index], buttons[index])
+    uploadTasks.push(
+      createFileUploadTask(
+        file,
+        progresses[index],
+        buttons[index],
+        statuses[index]
+      )
     );
   });
 
-  const responses = await Promise.allSettled(filePromises);
-
-  // Handle app state change
-  filesToUpload.forEach((file) => {
-    filesToDownload.push(file);
-  });
-  filesToUpload.splice(0);
-  filePreviews.update(
-    filesToDownload.map((file) => file.name + ' is ready.'),
-    { button: false, bar: false }
-  );
-  statusMessage.update('✅ Success');
-  resetButton.enable();
-
-  // Log response
-  responses.forEach((response) => {
-    if (response.status === 'fulfilled') {
-      display.innerText += response.value + '\n';
+  const uploadResults = await Promise.allSettled(uploadTasks);
+  uploadResults.forEach((result, index) => {
+    if (result.status === 'fulfilled') {
+      filesToDownload.push(filesToUpload[index].name);
+      tasksToPoll.push(result.value);
     } else {
-      display.innerText += response.reason + '\n';
+      filesNotCompleted.push(filesToUpload[index].name);
     }
   });
+  filesToUpload.splice(0);
+  return tasksToPoll;
 }
 
-function createFileUploadTask(data, progress, button) {
+async function pollFiles(tasks) {
+  const statuses = Array.from(filePreviews.pointer.querySelectorAll('span'));
+
+  const pollTasks = [];
+  const tasksCompleted = [];
+
+  tasks.forEach((task, index) => {
+    pollTasks.push(createFilePollingTask(task, statuses[index]));
+  });
+
+  const pollResults = await Promise.allSettled(pollTasks);
+  pollResults.forEach((result, index) => {
+    if (result.status === 'fulfilled') {
+      // success.innerText += JSON.stringify(result.value) + '\n';
+      tasksCompleted.push(result.value);
+    } else {
+      // failure.innerText += result.reason + '\n';
+      filesNotCompleted.push(filesToDownload[index]);
+    }
+  });
+  console.log(tasksCompleted);
+  return tasksCompleted;
+}
+async function downloadFiles(tasks) {}
+//#######################################################################
+function createFileUploadTask(file, progress, button, status) {
   return new Promise((resolve, reject) => {
     const deleteButton = new components.HidableElement(button);
     const progressBar = new components.ProgressBar(progress);
     const progressBarHidable = new components.HidableElement(progress);
+    const statusText = new components.StatusText(status);
+    const statusTextHidable = new components.HidableElement(status);
+
+    const formData = new FormData();
+    formData.append('file', file);
 
     const url = 'https://filetools13.pdf24.org/client.php?action=upload';
     const method = 'POST';
     const xhr = new XMLHttpRequest();
-
-    const formData = new FormData();
-    // Add the file to FormData
-    formData.append('file', data);
 
     // Configure XMLHttpRequest
     xhr.open(method, url);
@@ -225,20 +274,31 @@ function createFileUploadTask(data, progress, button) {
       progressBar.update(event.loaded / event.total);
     };
 
-    xhr.onload = () => {
-      progressBarHidable.hide();
+    xhr.onerror = () => {
+      statusText.update('⚠️ failed to upload');
+      reject('Network error while uploading file:', file.name);
     };
 
-    xhr.onloadend = () => {
-      if (xhr.status === 200) {
-        resolve(xhr.responseText);
+    xhr.onload = async () => {
+      progressBarHidable.hide();
+      statusTextHidable.show();
+      if (xhr.status < 300 && xhr.status >= 200) {
+        statusText.update('✔️ uploaded');
+        // Parse response object
+        const response = JSON.parse(xhr.responseText);
+        // Start file compression job
+        try {
+          const ongoingTask = await signalTaskStart(response);
+          statusText.update('♻️ starting');
+          resolve(ongoingTask);
+        } catch (error) {
+          statusText.update('⭕️ failed to start compression');
+          reject('Error:' + error.message);
+        }
       } else {
+        statusText.update('❌ failed to upload');
         reject('Error:' + xhr.status);
       }
-    };
-
-    xhr.onerror = () => {
-      reject('Network error while uploading file:', file.name);
     };
 
     // Send request
@@ -246,39 +306,116 @@ function createFileUploadTask(data, progress, button) {
   });
 }
 
-// function createFilePollingTask(data) {
-//   return new Promise((resolve, reject) => {
-//     const pollInterval = 2000;
-//     const pollTimeout = 5 * pollInterval;
-//     const url = 'https://httpbin.org/post';
-//     const method = 'GET';
-//     const xhr = new XMLHttpRequest();
+function createFilePollingTask(data, status) {
+  return new Promise((resolve, reject) => {
+    const statusText = new components.StatusText(status);
+    const statusTextHidable = new components.HidableElement(status);
 
-//     xhr.addEventListener('loadend', () => {
-//       if (xhr.status < 300 && xhr.status >= 200) {
-//         const fileStatus = JSON.parse(xhr.responseText);
-//         if (fileStatus === 'DONE') {
-//           clearInterval(polling);
-//           clearTimeout(timeout);
-//           resolve(xhr.responseText);
-//         }
-//       } else {
-//         clearInterval(polling);
-//         clearTimeout(timeout);
-//         reject(xhr.status + '::' + xhr.statusText);
-//       }
-//     });
+    const pollInterval = 1000;
+    const pollTimeout = 2 * pollInterval;
 
-//     xhr.open(method, url);
-//     xhr.setRequestHeader('Content-Type', 'multipart/form-data');
+    statusTextHidable.show();
+    statusText.update('🟡 compressing');
 
-//     const timeout = setTimeout(() => {
-//       clearInterval(polling);
-//       reject('Timed out');
-//     }, pollTimeout);
+    let randNum;
 
-//     const polling = setInterval(() => {
-//       xhr.send(data);
-//     }, pollInterval);
-//   });
-// }
+    const mockTimeout = setTimeout(() => {
+      clearInterval(mockPolling);
+      statusText.update('🔴 too long to complete');
+      reject();
+    }, pollTimeout);
+
+    const mockPolling = setInterval(() => {
+      randNum = Math.floor(Math.random() * 10) + 1;
+      if (randNum >= 5) {
+        clearTimeout(mockTimeout);
+        clearInterval(mockPolling);
+        statusText.update('🟢 ready to download');
+        resolve(data);
+      }
+    }, pollInterval);
+
+    // const url = `https://filetools13.pdf24.org/client.php?action=getStatus&jobId=${data.jobId}`;
+    // const method = 'GET';
+    // const xhr = new XMLHttpRequest();
+
+    // Configure XMLHttpRequest
+    // xhr.open(method, url);
+
+    // xhr.onloadstart = () => {
+    //   statusTextHidable.show();
+    //   statusText.update('🟡 compressing');
+    // };
+
+    // xhr.onerror = () => {
+    //   statusText.update('⚠️ polling failed');
+    //   reject('Network error while tracking file status');
+    // };
+
+    // xhr.onload = () => {
+    //   if (xhr.status < 300 && xhr.status >= 200) {
+    //     const fileStatus = JSON.parse(xhr.responseText).status;
+    //     if (fileStatus === 'done') {
+    //       statusText.update('🟢 ready to download');
+    //       resolve(data);
+    //     }
+    //   } else {
+    //     statusText.update('❌ polling failed');
+    //     reject('Error:' + xhr.status);
+    //   }
+    // };
+
+    // xhr.onloadend = () => {
+    //   clearTimeout(timeout);
+    //   clearInterval(polling);
+    // };
+
+    // const timeout = setTimeout(() => {
+    //   clearInterval(polling);
+    //   statusText.update('🔴 too long to complete');
+    //   reject('Timed out');
+    // }, pollTimeout);
+
+    // const polling = setInterval(() => {
+    //   xhr.send(data);
+    // }, pollInterval);
+  });
+}
+//#######################################################################
+function signalTaskStart(data) {
+  return new Promise((resolve, reject) => {
+    const options = formJSON.getValues();
+    const payload = JSON.stringify({
+      files: data,
+      dpi: parseInt(options.dpi),
+      imageQuality: parseInt(options.imgQuality),
+      mode: 'normal',
+      colorModel: options.grayScale ? 'gray' : '',
+    });
+
+    const url = 'https://filetools13.pdf24.org/client.php?action=compressPdf';
+    const method = 'POST';
+    const xhr = new XMLHttpRequest();
+
+    // Configure XMLHttpRequest
+    xhr.open(method, url);
+    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+
+    xhr.onerror = () => {
+      reject('Network error while trying to start file compression');
+      // throw new Error('unable to start compression');
+    };
+
+    xhr.onload = () => {
+      if (xhr.status < 300 && xhr.status >= 200) {
+        const response = JSON.parse(xhr.responseText);
+        resolve(response);
+      } else {
+        reject('unable to start compression');
+      }
+    };
+
+    // Send request
+    xhr.send(payload);
+  });
+}
