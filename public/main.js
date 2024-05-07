@@ -197,15 +197,8 @@ async function sendFiles(files) {
   responses.forEach((response) => {
     if (response.status === 'fulfilled') {
       // response.value returns an object
-      success.innerText +=
-        JSON.stringify({
-          files: response.value,
-          dpi: 144,
-          imageQuality: 85,
-          mode: 'normal',
-          colorModel: '',
-        }) + '\n';
-      console.log(response.value);
+      success.innerText += response.value;
+      // console.log(response.value);
     } else {
       failure.innerText += response.reason + '\n';
     }
@@ -244,18 +237,19 @@ function createFileUploadTask(data, progress, button) {
 
     xhr.onload = () => {
       progressBarHidable.hide();
-    };
-
-    xhr.onloadend = () => {
       if (xhr.status === 200) {
         // Parse response object
         const response = JSON.parse(xhr.responseText);
         // Start file compression job
-
-        resolve(response);
+        const anotherResponse = signalTaskStart(response);
+        resolve(anotherResponse);
       } else {
         reject('Error:' + xhr.status);
       }
+    };
+
+    xhr.onloadend = () => {
+      console.log('Cleaned up!');
     };
 
     // Send request
@@ -263,7 +257,18 @@ function createFileUploadTask(data, progress, button) {
   });
 }
 
-function startFileCompression(response) {}
+function signalTaskStart(data) {
+  const options = formJSON.getValues();
+  const payload = JSON.stringify({
+    files: data,
+    dpi: parseInt(options.dpi),
+    imageQuality: parseInt(options.imgQuality),
+    mode: 'normal',
+    colorModel: options.grayScale ? 'gray' : '',
+  });
+
+  return payload;
+}
 
 // function createFilePollingTask(data) {
 //   return new Promise((resolve, reject) => {
