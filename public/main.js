@@ -2,6 +2,7 @@ import * as components from './modules/components.js';
 
 const filesToUpload = [];
 const filesToDownload = [];
+const filesNotCompleted = [];
 
 const display = document.getElementById('display');
 const success = display.querySelector('.success');
@@ -165,7 +166,7 @@ async function handleSubmit(event) {
   resetButton.disable();
   statusMessage.update('⏳ Uploading files...');
   // Upload
-  await sendFiles(filesToUpload);
+  const tasksToPoll = await sendFiles(filesToUpload);
   // await pollFiles();
 }
 
@@ -178,11 +179,13 @@ async function sendFiles(files) {
     filePreviews.pointer.querySelectorAll('progress')
   );
   const buttons = Array.from(filePreviews.pointer.querySelectorAll('button'));
-  const statuses = Array.from(filePreviews.pointer.querySelectorAll('span'));
+  let statuses = Array.from(filePreviews.pointer.querySelectorAll('span'));
 
-  const filePromises = [];
+  const uploadTasks = [];
+  const tasksToPoll = [];
+
   files.forEach((file, index) => {
-    filePromises.push(
+    uploadTasks.push(
       createFileUploadTask(
         file,
         progresses[index],
@@ -192,33 +195,46 @@ async function sendFiles(files) {
     );
   });
 
-  const responses = await Promise.allSettled(filePromises);
+  const uploadResults = await Promise.allSettled(uploadTasks);
   //#######################################################################
   // Handle app state change
-  filesToUpload.forEach((file) => {
-    filesToDownload.push(file);
-  });
-  filesToUpload.splice(0);
-  // Render file downloads
-  // filePreviews.update(
-  //   filesToDownload.map((file) => file.name),
-  //   { button: false, bar: false, text: true }
-  // );
-  statusMessage.update('✅ Success');
-  resetButton.enable();
-  //#######################################################################
-  // Log response
-  responses.forEach((response) => {
-    if (response.status === 'fulfilled') {
-      // Response.value returns an object
-      console.log(response.value);
-      success.innerText += JSON.stringify(response.value) + '\n';
-      // console.log(response.value);
+  uploadResults.forEach((result, index) => {
+    if (result.status === 'fulfilled') {
+      filesToDownload.push(filesToUpload[index].name);
+      tasksToPoll.push(result.value);
     } else {
-      failure.innerText += response.reason + '\n';
+      filesNotCompleted.push(filesToUpload[index].name);
     }
   });
+
+  filesToUpload.splice(0);
+  // Render file downloads
+  filePreviews.update(filesToDownload, {
+    button: false,
+    bar: false,
+    text: true,
+  });
+
+  //#######################################################################
+
+  statusMessage.update('✅ Success');
+  resetButton.enable();
+  return tasksToPoll;
+  //#######################################################################
+  // Log response
+  // uploadResults.forEach((result) => {
+  //   if (result.status === 'fulfilled') {
+  //     success.innerText += result.value + '\n';
+  //   } else {
+  //     failure.innerText += result.reason + '\n';
+  //   }
+  // });
 }
+
+async function pollFiles(tasks) {
+  const statuses = Array.from(filePreviews.pointer.querySelectorAll('span'));
+}
+
 //#######################################################################
 function createFileUploadTask(file, progress, button, status) {
   return new Promise((resolve, reject) => {
@@ -317,39 +333,41 @@ function signalTaskStart(data) {
   });
 }
 
-// function createFilePollingTask(data) {
-//   return new Promise((resolve, reject) => {
-//     const pollInterval = 2000;
-//     const pollTimeout = 5 * pollInterval;
-//     const url = 'https://httpbin.org/post';
-//     const method = 'GET';
-//     const xhr = new XMLHttpRequest();
+function createFilePollingTask(data) {
+  return new Promise((resolve, reject) => {
+    const pollInterval = 2000;
+    const pollTimeout = 5 * pollInterval;
 
-//     xhr.addEventListener('loadend', () => {
-//       if (xhr.status < 300 && xhr.status >= 200) {
-//         const fileStatus = JSON.parse(xhr.responseText);
-//         if (fileStatus === 'DONE') {
-//           clearInterval(polling);
-//           clearTimeout(timeout);
-//           resolve(xhr.responseText);
-//         }
-//       } else {
-//         clearInterval(polling);
-//         clearTimeout(timeout);
-//         reject(xhr.status + '::' + xhr.statusText);
-//       }
-//     });
+    const url = `https://filetools13.pdf24.org/client.php?action=getStatus&jobId=${data.jobId}`;
+    resolve(url);
+    const method = 'GET';
+    const xhr = new XMLHttpRequest();
 
-//     xhr.open(method, url);
-//     xhr.setRequestHeader('Content-Type', 'multipart/form-data');
+    xhr.addEventListener('loadend', () => {
+      if (xhr.status < 300 && xhr.status >= 200) {
+        const fileStatus = JSON.parse(xhr.responseText);
+        if (fileStatus === 'DONE') {
+          clearInterval(polling);
+          clearTimeout(timeout);
+          resolve(xhr.responseText);
+        }
+      } else {
+        clearInterval(polling);
+        clearTimeout(timeout);
+        reject(xhr.status + '::' + xhr.statusText);
+      }
+    });
 
-//     const timeout = setTimeout(() => {
-//       clearInterval(polling);
-//       reject('Timed out');
-//     }, pollTimeout);
+    xhr.open(method, url);
+    xhr.setRequestHeader('Content-Type', 'multipart/form-data');
 
-//     const polling = setInterval(() => {
-//       xhr.send(data);
-//     }, pollInterval);
-//   });
-// }
+    const timeout = setTimeout(() => {
+      clearInterval(polling);
+      reject('Timed out');
+    }, pollTimeout);
+
+    const polling = setInterval(() => {
+      xhr.send(data);
+    }, pollInterval);
+  });
+}
