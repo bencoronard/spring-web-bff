@@ -37,17 +37,20 @@ export class PreviewListInteractive extends PreviewList {
     this.statePointer = statePointer;
   }
 
-  update(items, option) {
+  update(items, options) {
     this.clear();
     items.forEach((item) => {
       const li = document.createElement('li');
       li.classList.add(`${this.pointer.id}-item`);
       li.textContent = item;
       this.pointer.appendChild(li);
-      if (option.bar) {
+      if (options.bar) {
         this.addProgressBar(li);
       }
-      if (option.button) {
+      if (options.text) {
+        this.addStatusText(li);
+      }
+      if (options.button) {
         this.addButton(li);
       }
     });
@@ -73,6 +76,13 @@ export class PreviewListInteractive extends PreviewList {
     progressBar.classList.add(`${this.pointer.id}-item-progBar`);
     progressBar.classList.add(`hidden`);
     element.appendChild(progressBar);
+  }
+
+  addStatusText(element) {
+    const statusText = document.createElement('span');
+    statusText.classList.add(`${this.pointer.id}-item-statTxt`);
+    statusText.classList.add(`hidden`);
+    element.appendChild(statusText);
   }
 }
 

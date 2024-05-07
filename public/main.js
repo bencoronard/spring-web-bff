@@ -78,6 +78,7 @@ const appStateTracker = new MutationObserver((mutationsList) => {
 });
 
 //#######################################################################
+//###################     INITIALIZATIONS    ############################
 //#######################################################################
 
 selectButton.addClickHandle(() => {
@@ -97,6 +98,7 @@ resetAppState();
 appStateTracker.observe(filePreviews.pointer, { childList: true });
 
 //#######################################################################
+//###################      APP STATE FUNCTIONS      #####################
 //#######################################################################
 function resetAppState() {
   filesToUpload.splice(0);
@@ -123,12 +125,13 @@ function handleDownload() {
 function handleFileUpload(uploadedFiles) {
   try {
     extractFiles(uploadedFiles);
-  } catch (err) {
-    statusMessage.update(err.message);
+  } catch (error) {
+    statusMessage.update(error.message);
   }
+  // Initialize uploaded file previews
   filePreviews.update(
     filesToUpload.map((file) => file.name),
-    { button: true, bar: true }
+    { button: true, bar: true, text: true }
   );
   submitButton.enable();
 }
@@ -166,16 +169,26 @@ async function handleSubmit(event) {
   // await pollFiles();
 }
 
+//#######################################################################
+//##################       NETWORK FUNCTIONS      #######################
+//#######################################################################
+
 async function sendFiles(files) {
   const progresses = Array.from(
     filePreviews.pointer.querySelectorAll('progress')
   );
   const buttons = Array.from(filePreviews.pointer.querySelectorAll('button'));
+  const statuses = Array.from(filePreviews.pointer.querySelectorAll('span'));
 
   const filePromises = [];
   files.forEach((file, index) => {
     filePromises.push(
-      createFileUploadTask(file, progresses[index], buttons[index])
+      createFileUploadTask(
+        file,
+        progresses[index],
+        buttons[index],
+        statuses[index]
+      )
     );
   });
 
@@ -186,18 +199,20 @@ async function sendFiles(files) {
     filesToDownload.push(file);
   });
   filesToUpload.splice(0);
-  filePreviews.update(
-    filesToDownload.map((file) => file.name + ' is ready.'),
-    { button: false, bar: false }
-  );
+  // Render file downloads
+  // filePreviews.update(
+  //   filesToDownload.map((file) => file.name),
+  //   { button: false, bar: false, text: true }
+  // );
   statusMessage.update('✅ Success');
   resetButton.enable();
 
   // Log response
   responses.forEach((response) => {
     if (response.status === 'fulfilled') {
-      // response.value returns an object
-      success.innerText += response.value;
+      // Response.value returns an object
+      console.log('promise: ', response.value);
+      success.innerText += JSON.stringify(response.value) + '\n';
       // console.log(response.value);
     } else {
       failure.innerText += response.reason + '\n';
@@ -205,19 +220,20 @@ async function sendFiles(files) {
   });
 }
 //#######################################################################
-function createFileUploadTask(data, progress, button) {
+function createFileUploadTask(file, progress, button, status) {
   return new Promise((resolve, reject) => {
     const deleteButton = new components.HidableElement(button);
     const progressBar = new components.ProgressBar(progress);
     const progressBarHidable = new components.HidableElement(progress);
+    const statusText = new components.StatusText(status);
+    const statusTextHidable = new components.HidableElement(status);
+
+    const formData = new FormData();
+    formData.append('file', file);
 
     const url = 'https://filetools13.pdf24.org/client.php?action=upload';
     const method = 'POST';
     const xhr = new XMLHttpRequest();
-
-    const formData = new FormData();
-    // Add the file to FormData
-    formData.append('file', data);
 
     // Configure XMLHttpRequest
     xhr.open(method, url);
@@ -235,29 +251,35 @@ function createFileUploadTask(data, progress, button) {
       reject('Network error while uploading file:', file.name);
     };
 
-    xhr.onload = () => {
+    xhr.onload = async () => {
       progressBarHidable.hide();
+      statusTextHidable.show();
       if (xhr.status === 200) {
+        statusText.update('uploaded');
         // Parse response object
         const response = JSON.parse(xhr.responseText);
         // Start file compression job
-        const anotherResponse = signalTaskStart(response);
-        resolve(anotherResponse);
+        try {
+          const anotherResponse = await signalTaskStart(response);
+          console.log('outside: ', anotherResponse);
+          resolve(anotherResponse);
+        } catch (error) {
+          reject('Error:' + error.message);
+        }
       } else {
+        statusText.update('failed to upload');
         reject('Error:' + xhr.status);
       }
     };
 
-    xhr.onloadend = () => {
-      console.log('Cleaned up!');
-    };
+    // xhr.onloadend = () => {};
 
     // Send request
     xhr.send(formData);
   });
 }
 
-function signalTaskStart(data) {
+async function signalTaskStart(data) {
   const options = formJSON.getValues();
   const payload = JSON.stringify({
     files: data,
@@ -267,7 +289,32 @@ function signalTaskStart(data) {
     colorModel: options.grayScale ? 'gray' : '',
   });
 
-  return payload;
+  const url = 'https://filetools13.pdf24.org/client.php?action=compressPdf';
+  const method = 'POST';
+  const xhr = new XMLHttpRequest();
+
+  // Configure XMLHttpRequest
+  xhr.open(method, url);
+  xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+
+  xhr.onerror = () => {
+    throw new Error('unable to start compression');
+  };
+
+  xhr.onload = () => {
+    if (xhr.status === 200) {
+      const response = xhr.responseText;
+      console.log('inside: ', response);
+      return response;
+    } else {
+      throw new Error(xhr.status);
+    }
+  };
+
+  // xhr.onloadend = () => {};
+
+  // Send request
+  xhr.send(payload);
 }
 
 // function createFilePollingTask(data) {
