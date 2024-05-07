@@ -165,9 +165,20 @@ async function handleSubmit(event) {
   selectButton.disable();
   resetButton.disable();
   statusMessage.update('⏳ Uploading files...');
+
   // Upload
   const tasksToPoll = await sendFiles(filesToUpload);
-  // await pollFiles();
+
+  // Render file downloads
+  filePreviews.update(filesToDownload, {
+    button: false,
+    bar: false,
+    text: true,
+  });
+  statusMessage.update('✅ Success');
+  resetButton.enable();
+
+  await pollFiles(tasksToPoll);
 }
 
 //#######################################################################
@@ -179,7 +190,7 @@ async function sendFiles(files) {
     filePreviews.pointer.querySelectorAll('progress')
   );
   const buttons = Array.from(filePreviews.pointer.querySelectorAll('button'));
-  let statuses = Array.from(filePreviews.pointer.querySelectorAll('span'));
+  const statuses = Array.from(filePreviews.pointer.querySelectorAll('span'));
 
   const uploadTasks = [];
   const tasksToPoll = [];
@@ -196,8 +207,6 @@ async function sendFiles(files) {
   });
 
   const uploadResults = await Promise.allSettled(uploadTasks);
-  //#######################################################################
-  // Handle app state change
   uploadResults.forEach((result, index) => {
     if (result.status === 'fulfilled') {
       filesToDownload.push(filesToUpload[index].name);
@@ -206,33 +215,26 @@ async function sendFiles(files) {
       filesNotCompleted.push(filesToUpload[index].name);
     }
   });
-
   filesToUpload.splice(0);
-  // Render file downloads
-  filePreviews.update(filesToDownload, {
-    button: false,
-    bar: false,
-    text: true,
-  });
-
-  //#######################################################################
-
-  statusMessage.update('✅ Success');
-  resetButton.enable();
   return tasksToPoll;
-  //#######################################################################
-  // Log response
-  // uploadResults.forEach((result) => {
-  //   if (result.status === 'fulfilled') {
-  //     success.innerText += result.value + '\n';
-  //   } else {
-  //     failure.innerText += result.reason + '\n';
-  //   }
-  // });
 }
 
 async function pollFiles(tasks) {
   const statuses = Array.from(filePreviews.pointer.querySelectorAll('span'));
+  const pollTasks = [];
+
+  tasks.forEach((task, index) => {
+    pollTasks.push(createFilePollingTask(task, statuses[index]));
+  });
+
+  const pollResults = await Promise.allSettled(pollTasks);
+  pollResults.forEach((result) => {
+    if (result.status === 'fulfilled') {
+      success.innerText += result.value + '\n';
+    } else {
+      failure.innerText += result.reason + '\n';
+    }
+  });
 }
 
 //#######################################################################
@@ -295,6 +297,49 @@ function createFileUploadTask(file, progress, button, status) {
     xhr.send(formData);
   });
 }
+
+function createFilePollingTask(data, status) {
+  return new Promise((resolve, reject) => {
+    const statusText = new components.StatusText(status);
+    const statusTextHidable = new components.HidableElement(status);
+
+    const pollInterval = 2000;
+    const pollTimeout = 5 * pollInterval;
+
+    const url = `https://filetools13.pdf24.org/client.php?action=getStatus&jobId=${data.jobId}`;
+    resolve(url);
+    // const method = 'GET';
+    // const xhr = new XMLHttpRequest();
+
+    // xhr.addEventListener('loadend', () => {
+    //   if (xhr.status < 300 && xhr.status >= 200) {
+    //     const fileStatus = JSON.parse(xhr.responseText);
+    //     if (fileStatus === 'DONE') {
+    //       clearInterval(polling);
+    //       clearTimeout(timeout);
+    //       resolve(xhr.responseText);
+    //     }
+    //   } else {
+    //     clearInterval(polling);
+    //     clearTimeout(timeout);
+    //     reject(xhr.status + '::' + xhr.statusText);
+    //   }
+    // });
+
+    // xhr.open(method, url);
+    // xhr.setRequestHeader('Content-Type', 'multipart/form-data');
+
+    // const timeout = setTimeout(() => {
+    //   clearInterval(polling);
+    //   reject('Timed out');
+    // }, pollTimeout);
+
+    // const polling = setInterval(() => {
+    //   xhr.send(data);
+    // }, pollInterval);
+  });
+}
+//#######################################################################
 function signalTaskStart(data) {
   return new Promise((resolve, reject) => {
     const options = formJSON.getValues();
@@ -330,44 +375,5 @@ function signalTaskStart(data) {
 
     // Send request
     xhr.send(payload);
-  });
-}
-
-function createFilePollingTask(data) {
-  return new Promise((resolve, reject) => {
-    const pollInterval = 2000;
-    const pollTimeout = 5 * pollInterval;
-
-    const url = `https://filetools13.pdf24.org/client.php?action=getStatus&jobId=${data.jobId}`;
-    resolve(url);
-    const method = 'GET';
-    const xhr = new XMLHttpRequest();
-
-    xhr.addEventListener('loadend', () => {
-      if (xhr.status < 300 && xhr.status >= 200) {
-        const fileStatus = JSON.parse(xhr.responseText);
-        if (fileStatus === 'DONE') {
-          clearInterval(polling);
-          clearTimeout(timeout);
-          resolve(xhr.responseText);
-        }
-      } else {
-        clearInterval(polling);
-        clearTimeout(timeout);
-        reject(xhr.status + '::' + xhr.statusText);
-      }
-    });
-
-    xhr.open(method, url);
-    xhr.setRequestHeader('Content-Type', 'multipart/form-data');
-
-    const timeout = setTimeout(() => {
-      clearInterval(polling);
-      reject('Timed out');
-    }, pollTimeout);
-
-    const polling = setInterval(() => {
-      xhr.send(data);
-    }, pollInterval);
   });
 }
