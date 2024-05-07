@@ -272,7 +272,7 @@ function createFileUploadTask(file, progress, button, status) {
     xhr.onload = async () => {
       progressBarHidable.hide();
       statusTextHidable.show();
-      if (xhr.status === 200) {
+      if (xhr.status < 300 && xhr.status >= 200) {
         statusText.update('✔️ uploaded');
         // Parse response object
         const response = JSON.parse(xhr.responseText);
@@ -365,7 +365,7 @@ function signalTaskStart(data) {
     };
 
     xhr.onload = () => {
-      if (xhr.status === 200) {
+      if (xhr.status < 300 && xhr.status >= 200) {
         const response = JSON.parse(xhr.responseText);
         resolve(response);
       } else {
