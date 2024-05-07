@@ -193,7 +193,7 @@ async function sendFiles(files) {
   });
 
   const responses = await Promise.allSettled(filePromises);
-
+  //#######################################################################
   // Handle app state change
   filesToUpload.forEach((file) => {
     filesToDownload.push(file);
@@ -206,12 +206,12 @@ async function sendFiles(files) {
   // );
   statusMessage.update('✅ Success');
   resetButton.enable();
-
+  //#######################################################################
   // Log response
   responses.forEach((response) => {
     if (response.status === 'fulfilled') {
       // Response.value returns an object
-      console.log('promise: ', response.value);
+      console.log(response.value);
       success.innerText += JSON.stringify(response.value) + '\n';
       // console.log(response.value);
     } else {
@@ -255,19 +255,20 @@ function createFileUploadTask(file, progress, button, status) {
       progressBarHidable.hide();
       statusTextHidable.show();
       if (xhr.status === 200) {
-        statusText.update('uploaded');
+        statusText.update('✔️ uploaded');
         // Parse response object
         const response = JSON.parse(xhr.responseText);
         // Start file compression job
         try {
           const anotherResponse = await signalTaskStart(response);
-          console.log('outside: ', anotherResponse);
+          statusText.update('♻️ compressing...');
           resolve(anotherResponse);
         } catch (error) {
+          statusText.update('⭕️ failed to start compression');
           reject('Error:' + error.message);
         }
       } else {
-        statusText.update('failed to upload');
+        statusText.update('❌ fail to upload');
         reject('Error:' + xhr.status);
       }
     };
@@ -278,43 +279,42 @@ function createFileUploadTask(file, progress, button, status) {
     xhr.send(formData);
   });
 }
+function signalTaskStart(data) {
+  return new Promise((resolve, reject) => {
+    const options = formJSON.getValues();
+    const payload = JSON.stringify({
+      files: data,
+      dpi: parseInt(options.dpi),
+      imageQuality: parseInt(options.imgQuality),
+      mode: 'normal',
+      colorModel: options.grayScale ? 'gray' : '',
+    });
 
-async function signalTaskStart(data) {
-  const options = formJSON.getValues();
-  const payload = JSON.stringify({
-    files: data,
-    dpi: parseInt(options.dpi),
-    imageQuality: parseInt(options.imgQuality),
-    mode: 'normal',
-    colorModel: options.grayScale ? 'gray' : '',
+    const url = 'https://filetools13.pdf24.org/client.php?action=compressPdf';
+    const method = 'POST';
+    const xhr = new XMLHttpRequest();
+
+    // Configure XMLHttpRequest
+    xhr.open(method, url);
+    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+
+    xhr.onerror = () => {
+      reject('Network error while trying to start file compression');
+      // throw new Error('unable to start compression');
+    };
+
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        const response = JSON.parse(xhr.responseText);
+        resolve(response);
+      } else {
+        reject('unable to start compression');
+      }
+    };
+
+    // Send request
+    xhr.send(payload);
   });
-
-  const url = 'https://filetools13.pdf24.org/client.php?action=compressPdf';
-  const method = 'POST';
-  const xhr = new XMLHttpRequest();
-
-  // Configure XMLHttpRequest
-  xhr.open(method, url);
-  xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-
-  xhr.onerror = () => {
-    throw new Error('unable to start compression');
-  };
-
-  xhr.onload = () => {
-    if (xhr.status === 200) {
-      const response = xhr.responseText;
-      console.log('inside: ', response);
-      return response;
-    } else {
-      throw new Error(xhr.status);
-    }
-  };
-
-  // xhr.onloadend = () => {};
-
-  // Send request
-  xhr.send(payload);
 }
 
 // function createFilePollingTask(data) {
