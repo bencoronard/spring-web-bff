@@ -1,70 +1,70 @@
-import * as components from "./modules/components.js";
+import * as components from './modules/components.js';
 
 const filesToUpload = [];
 const filesToDownload = [];
 
-const display = document.getElementById("display");
-const success = display.querySelector(".success");
-const failure = display.querySelector(".failure");
+const display = document.getElementById('display');
+const success = display.querySelector('.success');
+const failure = display.querySelector('.failure');
 
 const downloadButton = new components.DynamicButton(
-  document.getElementById("downloadButton")
+  document.getElementById('downloadButton')
 );
 const resetButton = new components.DynamicButton(
-  document.getElementById("resetButton")
+  document.getElementById('resetButton')
 );
 const selectButton = new components.DynamicButton(
-  document.getElementById("selectButton")
+  document.getElementById('selectButton')
 );
 const submitButton = new components.DynamicButton(
-  document.getElementById("submitButton")
+  document.getElementById('submitButton')
 );
 
 const fileDropZone = new components.DropZone(
-  document.getElementById("dropZone"),
+  document.getElementById('dropZone'),
   (event) => {
     handleFileUpload(event.dataTransfer.files);
   }
 );
 
 const filePreviews = new components.PreviewListInteractive(
-  document.getElementById("filePreviews"),
+  document.getElementById('filePreviews'),
   filesToUpload
 );
 
 const statusMessage = new components.StatusText(
-  document.getElementById("statusMessage")
+  document.getElementById('statusMessage')
 );
 const stageList = new components.ChromaticList(
-  document.getElementById("stageList")
+  document.getElementById('stageList')
 );
 
-const formJSON = new components.JsonForm(document.querySelector("form"));
+const formJSON = new components.JsonForm(document.querySelector('form'));
 
-const fileInput = document.getElementById("fileInput");
+const fileInput = document.getElementById('fileInput');
 const fileOptions = new components.HidableElement(
-  document.getElementById("options")
+  document.getElementById('options')
 );
 
 const appStateTracker = new MutationObserver((mutationsList) => {
   for (let mutation of mutationsList) {
-    if (mutation.type === "childList") {
+    if (mutation.type === 'childList') {
       const a = filesToUpload.length > 0 ? 1 : 0;
       const b = filesToDownload.length > 0 ? 1 : 0;
       switch (`${a}${b}`) {
-        case "00":
+        case '00':
           submitButton.disable();
           resetButton.disable();
           stageList.setStage(0);
           fileOptions.hide();
           break;
-        case "10":
+        case '10':
           submitButton.enable();
           resetButton.enable();
           stageList.setStage(1);
           fileOptions.show();
           break;
-        case "01":
+        case '01':
           selectButton.disable();
           submitButton.disable();
           downloadButton.enable();
@@ -85,10 +85,10 @@ selectButton.addClickHandle(() => {
 });
 downloadButton.addClickHandle(handleDownload);
 
-formJSON.pointer.addEventListener("submit", handleSubmit);
-formJSON.pointer.addEventListener("reset", resetAppState);
+formJSON.pointer.addEventListener('submit', handleSubmit);
+formJSON.pointer.addEventListener('reset', resetAppState);
 
-fileInput.addEventListener("change", () => {
+fileInput.addEventListener('change', () => {
   handleFileUpload(fileInput.files);
 });
 
@@ -101,7 +101,7 @@ appStateTracker.observe(filePreviews.pointer, { childList: true });
 function resetAppState() {
   filesToUpload.splice(0);
   filesToDownload.splice(0);
-  fileInput.value = "";
+  fileInput.value = '';
 
   filePreviews.clear();
   selectButton.enable();
@@ -114,11 +114,11 @@ function resetAppState() {
 
   statusMessage.update(`🤷‍♂ Nothing's uploaded`);
 
-  success.innerText = "";
-  failure.innerText = "";
+  success.innerText = '';
+  failure.innerText = '';
 }
 function handleDownload() {
-  console.log("Downloading...");
+  console.log('Downloading...');
 }
 function handleFileUpload(uploadedFiles) {
   try {
@@ -133,7 +133,7 @@ function handleFileUpload(uploadedFiles) {
   submitButton.enable();
 }
 function extractFiles(fileList) {
-  const allowedTypes = ["application/pdf"];
+  const allowedTypes = ['application/pdf'];
   const existingFiles = filesToUpload.map((file) => file.name);
   const invalidFiles = [];
   for (const file of fileList) {
@@ -147,7 +147,7 @@ function extractFiles(fileList) {
   }
   if (invalidFiles.length) {
     throw new Error(
-      `❌ Could not upload following files: ${invalidFiles.join(", ")}`
+      `❌ Could not upload following files: ${invalidFiles.join(', ')}`
     );
   }
 }
@@ -160,7 +160,7 @@ async function handleSubmit(event) {
   fileOptions.hide();
   selectButton.disable();
   resetButton.disable();
-  statusMessage.update("⏳ Uploading files...");
+  statusMessage.update('⏳ Uploading files...');
   // Upload
   await sendFiles(filesToUpload);
   // await pollFiles();
@@ -168,9 +168,9 @@ async function handleSubmit(event) {
 
 async function sendFiles(files) {
   const progresses = Array.from(
-    filePreviews.pointer.querySelectorAll("progress")
+    filePreviews.pointer.querySelectorAll('progress')
   );
-  const buttons = Array.from(filePreviews.pointer.querySelectorAll("button"));
+  const buttons = Array.from(filePreviews.pointer.querySelectorAll('button'));
 
   const filePromises = [];
   files.forEach((file, index) => {
@@ -187,27 +187,27 @@ async function sendFiles(files) {
   });
   filesToUpload.splice(0);
   filePreviews.update(
-    filesToDownload.map((file) => file.name + " is ready."),
+    filesToDownload.map((file) => file.name + ' is ready.'),
     { button: false, bar: false }
   );
-  statusMessage.update("✅ Success");
+  statusMessage.update('✅ Success');
   resetButton.enable();
 
   // Log response
   responses.forEach((response) => {
-    if (response.status === "fulfilled") {
+    if (response.status === 'fulfilled') {
       // response.value returns an object
       success.innerText +=
         JSON.stringify({
           files: response.value,
           dpi: 144,
           imageQuality: 85,
-          mode: "normal",
-          colorModel: "",
-        }) + "\n";
+          mode: 'normal',
+          colorModel: '',
+        }) + '\n';
       console.log(response.value);
     } else {
-      failure.innerText += response.reason + "\n";
+      failure.innerText += response.reason + '\n';
     }
   });
 }
@@ -218,13 +218,13 @@ function createFileUploadTask(data, progress, button) {
     const progressBar = new components.ProgressBar(progress);
     const progressBarHidable = new components.HidableElement(progress);
 
-    const url = "https://filetools13.pdf24.org/client.php?action=upload";
-    const method = "POST";
+    const url = 'https://filetools13.pdf24.org/client.php?action=upload';
+    const method = 'POST';
     const xhr = new XMLHttpRequest();
 
     const formData = new FormData();
     // Add the file to FormData
-    formData.append("file", data);
+    formData.append('file', data);
 
     // Configure XMLHttpRequest
     xhr.open(method, url);
@@ -238,27 +238,32 @@ function createFileUploadTask(data, progress, button) {
       progressBar.update(event.loaded / event.total);
     };
 
+    xhr.onerror = () => {
+      reject('Network error while uploading file:', file.name);
+    };
+
     xhr.onload = () => {
       progressBarHidable.hide();
     };
 
     xhr.onloadend = () => {
       if (xhr.status === 200) {
+        // Parse response object
         const response = JSON.parse(xhr.responseText);
+        // Start file compression job
+
         resolve(response);
       } else {
-        reject("Error:" + xhr.status);
+        reject('Error:' + xhr.status);
       }
-    };
-
-    xhr.onerror = () => {
-      reject("Network error while uploading file:", file.name);
     };
 
     // Send request
     xhr.send(formData);
   });
 }
+
+function startFileCompression(response) {}
 
 // function createFilePollingTask(data) {
 //   return new Promise((resolve, reject) => {
