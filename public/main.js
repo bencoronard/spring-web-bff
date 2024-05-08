@@ -3,6 +3,7 @@ import * as components from './modules/components.js';
 const filesToUpload = [];
 const filesToDownload = [];
 const filesNotCompleted = [];
+const tasksToDownload = [];
 
 const display = document.getElementById('display');
 const success = display.querySelector('.success');
@@ -120,9 +121,7 @@ function resetAppState() {
   success.innerText = '';
   failure.innerText = '';
 }
-function handleDownload() {
-  console.log('Downloading...');
-}
+
 function handleFileUpload(uploadedFiles) {
   try {
     extractFiles(uploadedFiles);
@@ -179,8 +178,20 @@ async function handleSubmit(event) {
 
   const tasksCompleted = await pollFiles(tasksToPoll);
 
+  tasksCompleted.forEach((task) => {
+    tasksToDownload.push(task);
+  });
+
   statusMessage.update('🚀 Files available to download');
 
+  resetButton.enable();
+}
+
+async function handleDownload() {
+  downloadButton.disable();
+  resetButton.disable();
+  await downloadFiles(tasksToDownload);
+  downloadButton.enable();
   resetButton.enable();
 }
 
@@ -200,12 +211,7 @@ async function sendFiles(files) {
 
   files.forEach((file, index) => {
     uploadTasks.push(
-      createFileUploadTask(
-        file,
-        progresses[index],
-        buttons[index],
-        statuses[index]
-      )
+      createUploadTask(file, progresses[index], buttons[index], statuses[index])
     );
   });
 
@@ -229,25 +235,42 @@ async function pollFiles(tasks) {
   const tasksCompleted = [];
 
   tasks.forEach((task, index) => {
-    pollTasks.push(createFilePollingTask(task, statuses[index]));
+    pollTasks.push(createPollingTask(task, statuses[index]));
   });
 
   const pollResults = await Promise.allSettled(pollTasks);
+
+  const indexToRemove = [];
   pollResults.forEach((result, index) => {
     if (result.status === 'fulfilled') {
-      // success.innerText += JSON.stringify(result.value) + '\n';
       tasksCompleted.push(result.value);
     } else {
-      // failure.innerText += result.reason + '\n';
       filesNotCompleted.push(filesToDownload[index]);
+      indexToRemove.push(index);
     }
   });
-  console.log(tasksCompleted);
+  indexToRemove
+    .sort((a, b) => b - a)
+    .forEach((index) => {
+      filesToDownload.splice(index, 1);
+    });
   return tasksCompleted;
 }
-async function downloadFiles(tasks) {}
+
+async function downloadFiles(tasks) {
+  const statuses = Array.from(filePreviews.pointer.querySelectorAll('span'));
+
+  const downloadTasks = [];
+  tasks.forEach((task, index) => {
+    downloadTasks.push(
+      createDownloadTask(task, filesToDownload[index], statuses[index])
+    );
+  });
+
+  await Promise.allSettled(downloadTasks);
+}
 //#######################################################################
-function createFileUploadTask(file, progress, button, status) {
+function createUploadTask(file, progress, button, status) {
   return new Promise((resolve, reject) => {
     const deleteButton = new components.HidableElement(button);
     const progressBar = new components.ProgressBar(progress);
@@ -293,11 +316,11 @@ function createFileUploadTask(file, progress, button, status) {
           resolve(ongoingTask);
         } catch (error) {
           statusText.update('⭕️ failed to start compression');
-          reject('Error:' + error.message);
+          reject('Error: ' + error.message);
         }
       } else {
         statusText.update('❌ failed to upload');
-        reject('Error:' + xhr.status);
+        reject('Error: ' + xhr.status);
       }
     };
 
@@ -306,7 +329,7 @@ function createFileUploadTask(file, progress, button, status) {
   });
 }
 
-function createFilePollingTask(data, status) {
+function createPollingTask(data, status) {
   return new Promise((resolve, reject) => {
     const statusText = new components.StatusText(status);
     const statusTextHidable = new components.HidableElement(status);
@@ -321,7 +344,7 @@ function createFilePollingTask(data, status) {
 
     const mockTimeout = setTimeout(() => {
       clearInterval(mockPolling);
-      statusText.update('🔴 too long to complete');
+      statusText.update('🟠 task took too long to complete');
       reject();
     }, pollTimeout);
 
@@ -361,7 +384,7 @@ function createFilePollingTask(data, status) {
     //     }
     //   } else {
     //     statusText.update('❌ polling failed');
-    //     reject('Error:' + xhr.status);
+    //     reject('Error: ' + xhr.status);
     //   }
     // };
 
@@ -381,6 +404,61 @@ function createFilePollingTask(data, status) {
     // }, pollInterval);
   });
 }
+
+function createDownloadTask(data, fileName, status) {
+  return new Promise((resolve, reject) => {
+    const statusText = new components.StatusText(status);
+
+    const url = `https://filetools13.pdf24.org/client.php?mode=download&action=downloadJobResult&jobId=${data.jobId}`;
+    const method = 'GET';
+    const xhr = new XMLHttpRequest();
+
+    // Configure XMLHttpRequest
+    xhr.open(method, url);
+    xhr.responseType = 'blob';
+
+    xhr.onloadstart = () => {
+      statusText.update('📀 downloading');
+    };
+
+    xhr.upload.onprogress = (event) => {
+      statusText.update(
+        `📀 ${Math.floor(event.loaded / event.total) * 100}% downloaded`
+      );
+    };
+
+    xhr.onerror = () => {
+      statusText.update('⚠️ failed to download');
+      reject('Network error while downloading file:', fileName);
+    };
+
+    xhr.onload = () => {
+      if (xhr.status < 300 && xhr.status >= 200) {
+        // Create a temporary anchor element to trigger the download
+        const downloadUrl = window.URL.createObjectURL(xhr.response);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = downloadUrl;
+        downloadLink.download = fileName + '_compressed';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+
+        // Clean up after the download is complete
+        document.body.removeChild(downloadLink);
+        window.URL.revokeObjectURL(downloadUrl);
+
+        statusText.update('💽 downloaded');
+        resolve();
+      } else {
+        statusText.update('❌ failed to download');
+        reject('Error: ' + xhr.status);
+      }
+    };
+
+    // Send request
+    xhr.send();
+  });
+}
+
 //#######################################################################
 function signalTaskStart(data) {
   return new Promise((resolve, reject) => {
