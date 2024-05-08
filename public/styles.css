@@ -16,6 +16,63 @@
 body {
   font-size: var(--font-normal);
 }
+
+.hidden {
+  display: none;
+}
+.container {
+  width: fit-content;
+  height: fit-content;
+  border: 1px solid cyan;
+}
+.wrapper {
+  width: fit-content;
+  height: fit-content;
+  border: 1px dashed red;
+}
+.faded-bg {
+  background-color: rgba(255, 163, 163, 0.5);
+}
+.centered {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.txtCentered {
+  text-align: center;
+}
+.columns {
+  column-count: 6;
+  column-rule: 1px solid #ccc;
+}
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 1em;
+}
+
+.card {
+  border: 1px dashed blue;
+}
+.filleted {
+  border-radius: var(--r-border);
+}
+.flex-vertical {
+  display: flex;
+  flex-direction: column;
+}
+.flex-horizontal {
+  display: flex;
+  flex-direction: row;
+}
+.flex-spread {
+  justify-content: space-between;
+}
+.flex-centered {
+  justify-content: center;
+  align-items: center;
+}
+
+/* #####################  APP  ##################### */
 .drop-area {
   background-color: rgba(203, 152, 252, 0.8);
   max-width: 1200px;
@@ -36,29 +93,11 @@ body {
   padding: 0.25em;
 }
 
-.flex-centered {
-  justify-content: center;
-  align-items: center;
-}
-.hidden {
-  display: none;
-}
 .colored {
   border: 2px solid rgb(0, 0, 0);
   color: rgb(0, 0, 0);
 }
 
-.flex-vertical {
-  display: flex;
-  flex-direction: column;
-}
-.flex-horizontal {
-  display: flex;
-  flex-direction: row;
-}
-.flex-spread {
-  justify-content: space-between;
-}
 #fileInput {
   display: none;
 }
@@ -90,7 +129,7 @@ body {
 }
 #slide-switch label::before {
   position: absolute;
-  content: "";
+  content: '';
   background-color: #fff;
   height: 1.5em;
   aspect-ratio: 1;
@@ -103,25 +142,8 @@ body {
 #slide-switch input:checked + label::before {
   transform: translateX(1.5em);
 }
-
-.container {
-  width: fit-content;
-  height: fit-content;
-  border: 1px solid cyan;
-}
-.wrapper {
-  width: fit-content;
-  height: fit-content;
-  border: 1px dashed red;
-}
-
 #options {
   border: 2px solid green;
   max-width: 1200px;
 }
-.success {
-  color: green;
-}
-.failure {
-  color: purple;
-}
+/* ################################################# */
