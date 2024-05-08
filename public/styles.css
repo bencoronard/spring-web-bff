@@ -1,0 +1,255 @@
+@import url('https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;700&display=swap');
+
+.istok-web-regular {
+  font-family: 'Istok Web', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.istok-web-bold {
+  font-family: 'Istok Web', sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  text-decoration: none;
+  color: inherit;
+}
+:root {
+  --f-base: 16px;
+  --f-small: 0.8rem;
+  --f-h6: 1.2rem;
+  --f-h5: 1.44rem;
+  --f-h4: 1.728rem;
+  --f-h3: 2.074rem;
+  --f-h2: 2.488rem;
+  --f-h1: 2.986rem;
+
+  --c-g600: #c1c1c1;
+  --c-g700: #585858;
+  --c-g800: #232323;
+  --c-g900: #000000;
+
+  --c-p200: #eff6ff;
+  --c-p400: #73b2ff;
+  --c-p500: #4a94ee;
+  --c-p600: #327fde;
+  --c-p700: #69829e;
+
+  --c-s500: #f9b66d;
+  --c-s600: #e0923d;
+
+  --c-e600: #ff7272;
+
+  --c-white: #ffffff;
+  --c-extra: #ffc700;
+
+  --r-border: 0.5em;
+  --t-animation: 200ms;
+}
+.this {
+  border: 1px dashed red;
+}
+html {
+  font-size: var(--f-base);
+}
+body {
+  font-family: Arial, sans-serif;
+}
+
+header > div:first-child {
+  height: 98px;
+}
+header > div:last-child {
+  height: 58px;
+}
+.logo {
+  font-size: 35px;
+}
+.logo > span {
+  color: var(--c-p600);
+}
+
+.faded-bg {
+  background-color: var(--c-p200);
+}
+.heavy-bg {
+  background-color: var(--c-p600);
+}
+.slot {
+  border: 1px solid var(--c-p600);
+  height: 64px;
+}
+.slot > span {
+  width: 17px;
+  height: 100%;
+}
+.hidden {
+  display: none;
+}
+.container {
+  height: 100%;
+  border: 1px solid cyan;
+}
+.wrapper {
+  width: fit-content;
+  height: fit-content;
+  border: 1px dashed red;
+}
+.link-button {
+  color: var(--c-white);
+  background-color: var(--c-p600);
+  border-radius: 5px;
+}
+.link-button:hover {
+  background-color: var(--c-p400);
+}
+.centered {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.txtCentered {
+  text-align: center;
+}
+.columns {
+  column-count: 6;
+  column-rule: 1px solid #ccc;
+}
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 1em;
+}
+.gallery > * {
+  border: 1px solid var(--c-p400);
+  border-radius: 5px;
+}
+.flex-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.flex-horizontal {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.flex-spread {
+  justify-content: space-between;
+}
+
+/* #####################  APP  ##################### */
+.drop-area {
+  width: 100%;
+  height: 257px;
+  border: 1px dashed var(--c-p600);
+  border-radius: 20px;
+
+  justify-content: center;
+  align-items: center;
+}
+#options {
+  border: 1px solid var(--c-p400);
+  border-radius: 4px;
+  width: min(100%, 721px);
+}
+
+#stageList {
+  width: 100%;
+}
+.stage {
+  border: 1px solid var(--c-g600);
+  color: var(--c-g600);
+  border-radius: 30px;
+  padding: 0.25em;
+}
+
+.colored {
+  border: 1px solid var(--c-p600);
+  color: var(--c-p600);
+}
+
+#fileInput {
+  display: none;
+}
+
+.highlight {
+  background-color: rgba(191, 255, 106, 0.8);
+  border: 2px dashed rgb(81, 255, 0);
+}
+.lowlight {
+  background-color: rgba(147, 147, 147, 0.8);
+  border: 2px dashed rgb(84, 84, 84);
+}
+
+#slide-switch {
+  width: fit-content;
+  height: fit-content;
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+}
+#slide-switch label {
+  background-color: #d2d2d2;
+  width: 3em;
+  height: 1.5em;
+  border-radius: 0.75em;
+  cursor: pointer;
+  position: relative;
+  transition: var(--t-animation);
+}
+#slide-switch label::before {
+  position: absolute;
+  content: '';
+  background-color: #fff;
+  height: 1.5em;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transition: var(--t-animation);
+}
+#slide-switch input {
+  display: none;
+}
+#slide-switch input:checked + label {
+  background-color: #20096d;
+}
+#slide-switch input:checked + label::before {
+  transform: translateX(1.5em);
+}
+
+form button {
+  background-color: var(--c-s500);
+  border: none;
+  border-radius: 5px;
+}
+form button:hover {
+  background-color: var(--c-s600);
+}
+form button:disabled {
+  background-color: var(--c-g600);
+  color: var(--c-g700);
+  cursor: not-allowed;
+}
+
+#filePreviews {
+  border: 1px solid purple;
+}
+.filePreviews-item {
+  border: 1px solid red;
+}
+.filePreviews-item-delBtn {
+  border-radius: 50%;
+  color: var(--c-white);
+  background-color: red;
+}
+form {
+  gap: 1em;
+}
+/* ################################################# */

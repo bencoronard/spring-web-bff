@@ -5,10 +5,6 @@ const filesToDownload = [];
 const filesNotCompleted = [];
 const tasksToDownload = [];
 
-const display = document.getElementById('display');
-const success = display.querySelector('.success');
-const failure = display.querySelector('.failure');
-
 const downloadButton = new components.DynamicButton(
   document.getElementById('downloadButton')
 );
@@ -117,9 +113,6 @@ function resetAppState() {
   fileOptions.hide();
 
   statusMessage.update(`🤷‍♂ Nothing's uploaded`);
-
-  success.innerText = '';
-  failure.innerText = '';
 }
 
 function handleFileUpload(uploadedFiles) {

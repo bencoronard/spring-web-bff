@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>PDF24 | Compress PDFDrag and Drop</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="faded-bg">
+        <div class="centered flex-horizontal flex-spread" style="height: 100%">
+          <div class="wrapper logo istok-web-bold">
+            PDF24 <span class="istok-web-regular">Tools</span>
+          </div>
+
+          <div class="wrapper">
+            <a href="#">Desktop Version</a>
+            <a href="#">Contact</a>
+            <a class="link-button" href="#">All PDF Tools</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="heavy-bg">
+        <div class="centered flex-horizontal flex-spread">
+          <div class="wrapper"><span>Reviews</span></div>
+
+          <div class="container flex-horizontal">
+            <div class="wrapper">
+              <span>Free</span>
+            </div>
+            <div class="wrapper">
+              <span>Online</span>
+            </div>
+            <div class="wrapper">
+              <span>No Limits</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section>
+        <div class="centered">
+          <h1>Compress PDF</h1>
+          <p>
+            PDF compressor to reduce the size of PDF files quickly and easily
+          </p>
+
+          <form class="flex-vertical this">
+            <div id="dropZone" class="drop-area flex-vertical faded-bg">
+              <ol id="stageList" class="flex-horizontal flex-spread">
+                <li class="stage">Upload files</li>
+                <li class="stage">Choose compression</li>
+                <li class="stage">Done</li>
+              </ol>
+
+              <p>
+                <strong>Status:</strong>
+                <span id="statusMessage">🤷‍♂ Nothing's uploaded</span>
+              </p>
+
+              <ul id="filePreviews"></ul>
+
+              <input
+                id="fileInput"
+                name="files"
+                type="file"
+                multiple
+                accept="application/pdf"
+              />
+
+              <div id="buttons">
+                <button id="selectButton" type="button">Select files</button>
+                <button id="downloadButton" type="button">Download</button>
+                <button id="resetButton" type="reset">Restart</button>
+              </div>
+            </div>
+
+            <div id="options" class="faded-bg">
+              <div class="container flex-vertical">
+                <label for="slider"
+                  ><strong>Level of compression</strong></label
+                >
+                <div class="wrapper flex-horizontal">
+                  <span>Small Size<br />Low Quality</span>
+                  <input
+                    type="range"
+                    name="compression"
+                    min="0"
+                    max="100"
+                    value="80"
+                  />
+                  <span>Big Size<br />High Quality</span>
+                </div>
+              </div>
+
+              <div class="container">
+                <p>Compression Settings</p>
+
+                <div class="container flex-horizontal">
+                  <div class="wrapper">
+                    <label for="dpi">DPI</label>
+                    <input
+                      type="number"
+                      name="dpi"
+                      min="72"
+                      max="300"
+                      value="144"
+                    />
+                  </div>
+
+                  <div class="wrapper">
+                    <label for="imgQual">Image quality</label>
+                    <input
+                      type="number"
+                      name="imgQuality"
+                      min="0"
+                      max="100"
+                      value="80"
+                    />
+                  </div>
+
+                  <div id="slide-switch" class="wrapper">
+                    <span>Color</span>
+                    <input type="checkbox" id="colorSwitch" name="grayScale" />
+                    <label for="colorSwitch"></label>
+                    <span>Gray</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button id="submitButton" type="submit">Compress</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="faded-bg">
+        <div class="centered">
+          <h1>Information</h1>
+
+          <ul class="flex-horizontal">
+            <li><span>Windows</span></li>
+            <li><span>Linux</span></li>
+            <li><span>MAC</span></li>
+            <li><span>iPhone</span></li>
+            <li><span>Android</span></li>
+          </ul>
+
+          <div class="gallery">
+            <div>
+              <h2>How to compress PDF files</h2>
+              <p>
+                Select your PDF files which you would like to compress or drop
+                them into the file box and start the compression. A few seconds
+                later you can download your compressed PDF files.
+              </p>
+            </div>
+            <div>
+              <h2>Adjustable quality</h2>
+              <p>
+                Adjustable quality You can adjust the compression quality so
+                that you can tune the compression algorithm in order to get a
+                perfect result. PDF files with images can be compressed better
+                than PDF files with text only.
+              </p>
+            </div>
+            <div>
+              <h2>Easy to use</h2>
+              <p>
+                Easy to use PDF24 makes it as easy and fast as possible for you
+                to compress your files. You don't need to install any software,
+                you only have to select your files and start the compression.
+              </p>
+            </div>
+            <div>
+              <h2>Runs on your system</h2>
+              <p>
+                The compression tool does not need any special system in order
+                to compress your PDF files. The app is browser based and works
+                under all operating systems.
+              </p>
+            </div>
+            <div>
+              <h2>No installation required</h2>
+              <p>
+                No installation required You do not need to download and install
+                any software. PDF files are compressed in the cloud on our
+                servers. The app does not consume your system resources.
+              </p>
+            </div>
+            <div>
+              <h2>Secure online compression</h2>
+              <p>
+                The compression tool does not keep your files longer than
+                necessary on our server. Your files and results will be deleted
+                from our server after a short period of time.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="slot centered flex-horizontal heavy-accent">
+          <span class="heavy-bg"></span>
+          <h1>FAQ</h1>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <section>
+        <div class="centered">
+          <h1>All tools</h1>
+          <ul class="centered columns">
+            <li><a href="#">Merge PDF</a></li>
+            <li><a href="#">Split PDF</a></li>
+            <li><a href="#">Compress PDF</a></li>
+            <li><a href="#">Edit PDF</a></li>
+            <li><a href="#">Sign PDF</a></li>
+            <li><a href="#">PDF Converter</a></li>
+            <li><a href="#">Convert to PDF</a></li>
+            <li><a href="#">Images to PDF</a></li>
+            <li><a href="#">PDF to Images</a></li>
+            <li><a href="#">Extract PDF Images</a></li>
+            <li><a href="#">Protect PDF</a></li>
+            <li><a href="#">Unlock PDF</a></li>
+            <li><a href="#">Rotate PDF pages</a></li>
+            <li><a href="#">Remove PDF pages</a></li>
+            <li><a href="#">Extract PDF pages</a></li>
+            <li><a href="#">Sort PDF pages</a></li>
+            <li><a href="#">Webpages to PDF</a></li>
+            <li><a href="#">Create PDF job application</a></li>
+            <li><a href="#">Create PDF with camera</a></li>
+            <li><a href="#">PDF OCR</a></li>
+            <li><a href="#">Add watermark</a></li>
+            <li><a href="#">Add page numbers</a></li>
+            <li><a href="#">View as PDF</a></li>
+            <li><a href="#">PDF Overlay</a></li>
+            <li><a href="#">Compare PDFs</a></li>
+            <li><a href="#">Web optimize PDF</a></li>
+            <li><a href="#">Annotate PDF</a></li>
+            <li><a href="#">Redact PDF</a></li>
+            <li><a href="#">Create PDF</a></li>
+            <li><a href="#">PDF 24 Creator</a></li>
+            <li><a href="#">PDF Printer</a></li>
+            <li><a href="#">PDF Reader</a></li>
+            <li><a href="#">Create Invoice</a></li>
+            <li><a href="#">Remove PDF metadata</a></li>
+            <li><a href="#">Flatten PDF</a></li>
+            <li><a href="#">Crop PDF</a></li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <ul class="centered flex-horizontal flex-spread">
+          <li><a href="#">About us</a></li>
+          <li><a href="#">Help</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Legal Notice</a></li>
+          <li><a href="#">Terms of use</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Privacy Settings</a></li>
+        </ul>
+      </section>
+
+      <section class="faded-bg">
+        <p class="centered txtCentered">
+          &copy; <span id="currentYear">2022</span> MangoByte Ltd. All rights
+          reserved.
+        </p>
+      </section>
+    </footer>
+
+    <script>
+      document.getElementById('currentYear').innerText =
+        new Date().getFullYear();
+    </script>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
