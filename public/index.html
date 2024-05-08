@@ -7,22 +7,38 @@
     <link rel="stylesheet" href="styles.css" />
     <title>PDF24 | Compress PDFDrag and Drop</title>
   </head>
+
   <body>
     <header>
       <div class="faded-bg">
-        <div class="centered flex-horizontal flex-spread">
-          <span class="logo">PDF24 <span>Tools</span></span>
+        <div class="centered flex-horizontal flex-spread" style="height: 100%">
+          <div class="wrapper logo istok-web-bold">
+            PDF24 <span class="istok-web-regular">Tools</span>
+          </div>
 
           <div class="wrapper">
             <a href="#">Desktop Version</a>
             <a href="#">Contact</a>
-            <a href="#">All PDF Tools</a>
+            <a class="link-button" href="#">All PDF Tools</a>
           </div>
         </div>
       </div>
-      <div>
-        <div class="centered flex-horizontal">
-          <span>Reviews</span>
+
+      <div class="heavy-bg">
+        <div class="centered flex-horizontal flex-spread">
+          <div class="wrapper"><span>Reviews</span></div>
+
+          <div class="container flex-horizontal">
+            <div class="wrapper">
+              <span>Free</span>
+            </div>
+            <div class="wrapper">
+              <span>Online</span>
+            </div>
+            <div class="wrapper">
+              <span>No Limits</span>
+            </div>
+          </div>
         </div>
       </div>
     </header>
@@ -34,8 +50,9 @@
           <p>
             PDF compressor to reduce the size of PDF files quickly and easily
           </p>
-          <form>
-            <div id="dropZone" class="drop-area flex-vertical">
+
+          <form class="flex-vertical this">
+            <div id="dropZone" class="drop-area flex-vertical faded-bg">
               <ol id="stageList" class="flex-horizontal flex-spread">
                 <li class="stage">Upload files</li>
                 <li class="stage">Choose compression</li>
@@ -58,13 +75,13 @@
               />
 
               <div id="buttons">
-                <button id="selectButton" type="button">Select Files</button>
+                <button id="selectButton" type="button">Select files</button>
                 <button id="downloadButton" type="button">Download</button>
                 <button id="resetButton" type="reset">Restart</button>
               </div>
             </div>
 
-            <div id="options">
+            <div id="options" class="faded-bg">
               <div class="container flex-vertical">
                 <label for="slider"
                   ><strong>Level of compression</strong></label
@@ -82,34 +99,38 @@
                 </div>
               </div>
 
-              <div class="container flex-horizontal flex-centered">
-                <div class="wrapper">
-                  <label for="dpi">DPI</label>
-                  <input
-                    type="number"
-                    name="dpi"
-                    min="72"
-                    max="300"
-                    value="144"
-                  />
-                </div>
+              <div class="container">
+                <p>Compression Settings</p>
 
-                <div class="wrapper">
-                  <label for="imgQual">Image quality</label>
-                  <input
-                    type="number"
-                    name="imgQuality"
-                    min="0"
-                    max="100"
-                    value="80"
-                  />
-                </div>
+                <div class="container flex-horizontal">
+                  <div class="wrapper">
+                    <label for="dpi">DPI</label>
+                    <input
+                      type="number"
+                      name="dpi"
+                      min="72"
+                      max="300"
+                      value="144"
+                    />
+                  </div>
 
-                <div id="slide-switch" class="wrapper">
-                  <span>Color</span>
-                  <input type="checkbox" id="colorSwitch" name="grayScale" />
-                  <label for="colorSwitch"></label>
-                  <span>Gray</span>
+                  <div class="wrapper">
+                    <label for="imgQual">Image quality</label>
+                    <input
+                      type="number"
+                      name="imgQuality"
+                      min="0"
+                      max="100"
+                      value="80"
+                    />
+                  </div>
+
+                  <div id="slide-switch" class="wrapper">
+                    <span>Color</span>
+                    <input type="checkbox" id="colorSwitch" name="grayScale" />
+                    <label for="colorSwitch"></label>
+                    <span>Gray</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -119,18 +140,20 @@
         </div>
       </section>
 
-      <section>
+      <section class="faded-bg">
         <div class="centered">
           <h1>Information</h1>
+
           <ul class="flex-horizontal">
-            <li>Windows</li>
-            <li>Linux</li>
-            <li>MAC</li>
-            <li>iPhone</li>
-            <li>Android</li>
+            <li><span>Windows</span></li>
+            <li><span>Linux</span></li>
+            <li><span>MAC</span></li>
+            <li><span>iPhone</span></li>
+            <li><span>Android</span></li>
           </ul>
+
           <div class="gallery">
-            <div class="card filleted">
+            <div>
               <h2>How to compress PDF files</h2>
               <p>
                 Select your PDF files which you would like to compress or drop
@@ -138,7 +161,7 @@
                 later you can download your compressed PDF files.
               </p>
             </div>
-            <div class="card filleted">
+            <div>
               <h2>Adjustable quality</h2>
               <p>
                 Adjustable quality You can adjust the compression quality so
@@ -147,7 +170,7 @@
                 than PDF files with text only.
               </p>
             </div>
-            <div class="card filleted">
+            <div>
               <h2>Easy to use</h2>
               <p>
                 Easy to use PDF24 makes it as easy and fast as possible for you
@@ -155,7 +178,7 @@
                 you only have to select your files and start the compression.
               </p>
             </div>
-            <div class="card filleted">
+            <div>
               <h2>Runs on your system</h2>
               <p>
                 The compression tool does not need any special system in order
@@ -163,7 +186,7 @@
                 under all operating systems.
               </p>
             </div>
-            <div class="card filleted">
+            <div>
               <h2>No installation required</h2>
               <p>
                 No installation required You do not need to download and install
@@ -171,7 +194,7 @@
                 servers. The app does not consume your system resources.
               </p>
             </div>
-            <div class="card filleted">
+            <div>
               <h2>Secure online compression</h2>
               <p>
                 The compression tool does not keep your files longer than
@@ -184,7 +207,8 @@
       </section>
 
       <section>
-        <div class="centered">
+        <div class="slot centered flex-horizontal heavy-accent">
+          <span class="heavy-bg"></span>
           <h1>FAQ</h1>
         </div>
       </section>
@@ -247,7 +271,7 @@
         </ul>
       </section>
 
-      <section>
+      <section class="faded-bg">
         <p class="centered txtCentered">
           &copy; <span id="currentYear">2022</span> MangoByte Ltd. All rights
           reserved.
@@ -255,6 +279,10 @@
       </section>
     </footer>
 
+    <script>
+      document.getElementById('currentYear').innerText =
+        new Date().getFullYear();
+    </script>
     <script type="module" src="main.js"></script>
   </body>
 </html>
