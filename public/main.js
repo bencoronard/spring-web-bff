@@ -1,71 +1,72 @@
-import * as components from "./modules/components.js";
+import * as components from './modules/components.js';
 
 const filesToUpload = [];
 const filesToDownload = [];
 const filesNotCompleted = [];
+const tasksToDownload = [];
 
-const display = document.getElementById("display");
-const success = display.querySelector(".success");
-const failure = display.querySelector(".failure");
+const display = document.getElementById('display');
+const success = display.querySelector('.success');
+const failure = display.querySelector('.failure');
 
 const downloadButton = new components.DynamicButton(
-  document.getElementById("downloadButton")
+  document.getElementById('downloadButton')
 );
 const resetButton = new components.DynamicButton(
-  document.getElementById("resetButton")
+  document.getElementById('resetButton')
 );
 const selectButton = new components.DynamicButton(
-  document.getElementById("selectButton")
+  document.getElementById('selectButton')
 );
 const submitButton = new components.DynamicButton(
-  document.getElementById("submitButton")
+  document.getElementById('submitButton')
 );
 
 const fileDropZone = new components.DropZone(
-  document.getElementById("dropZone"),
+  document.getElementById('dropZone'),
   (event) => {
     handleFileUpload(event.dataTransfer.files);
   }
 );
 
 const filePreviews = new components.PreviewListInteractive(
-  document.getElementById("filePreviews"),
+  document.getElementById('filePreviews'),
   filesToUpload
 );
 
 const statusMessage = new components.StatusText(
-  document.getElementById("statusMessage")
+  document.getElementById('statusMessage')
 );
 const stageList = new components.ChromaticList(
-  document.getElementById("stageList")
+  document.getElementById('stageList')
 );
 
-const formJSON = new components.JsonForm(document.querySelector("form"));
+const formJSON = new components.JsonForm(document.querySelector('form'));
 
-const fileInput = document.getElementById("fileInput");
+const fileInput = document.getElementById('fileInput');
 const fileOptions = new components.HidableElement(
-  document.getElementById("options")
+  document.getElementById('options')
 );
 
 const appStateTracker = new MutationObserver((mutationsList) => {
   for (let mutation of mutationsList) {
-    if (mutation.type === "childList") {
+    if (mutation.type === 'childList') {
       const a = filesToUpload.length > 0 ? 1 : 0;
       const b = filesToDownload.length > 0 ? 1 : 0;
       switch (`${a}${b}`) {
-        case "00":
+        case '00':
           submitButton.disable();
           resetButton.disable();
           stageList.setStage(0);
           fileOptions.hide();
           break;
-        case "10":
+        case '10':
           submitButton.enable();
           resetButton.enable();
           stageList.setStage(1);
           fileOptions.show();
           break;
-        case "01":
+        case '01':
           selectButton.disable();
           submitButton.disable();
           downloadButton.enable();
@@ -87,10 +88,10 @@ selectButton.addClickHandle(() => {
 });
 downloadButton.addClickHandle(handleDownload);
 
-formJSON.pointer.addEventListener("submit", handleSubmit);
-formJSON.pointer.addEventListener("reset", resetAppState);
+formJSON.pointer.addEventListener('submit', handleSubmit);
+formJSON.pointer.addEventListener('reset', resetAppState);
 
-fileInput.addEventListener("change", () => {
+fileInput.addEventListener('change', () => {
   handleFileUpload(fileInput.files);
 });
 
@@ -104,7 +105,7 @@ appStateTracker.observe(filePreviews.pointer, { childList: true });
 function resetAppState() {
   filesToUpload.splice(0);
   filesToDownload.splice(0);
-  fileInput.value = "";
+  fileInput.value = '';
 
   filePreviews.clear();
   selectButton.enable();
@@ -117,12 +118,10 @@ function resetAppState() {
 
   statusMessage.update(`🤷‍♂ Nothing's uploaded`);
 
-  success.innerText = "";
-  failure.innerText = "";
+  success.innerText = '';
+  failure.innerText = '';
 }
-function handleDownload() {
-  console.log("Downloading...");
-}
+
 function handleFileUpload(uploadedFiles) {
   try {
     extractFiles(uploadedFiles);
@@ -137,7 +136,7 @@ function handleFileUpload(uploadedFiles) {
   submitButton.enable();
 }
 function extractFiles(fileList) {
-  const allowedTypes = ["application/pdf"];
+  const allowedTypes = ['application/pdf'];
   const existingFiles = filesToUpload.map((file) => file.name);
   const invalidFiles = [];
   for (const file of fileList) {
@@ -151,7 +150,7 @@ function extractFiles(fileList) {
   }
   if (invalidFiles.length) {
     throw new Error(
-      `❌ Could not upload following files: ${invalidFiles.join(", ")}`
+      `❌ Could not upload following files: ${invalidFiles.join(', ')}`
     );
   }
 }
@@ -164,7 +163,7 @@ async function handleSubmit(event) {
   fileOptions.hide();
   selectButton.disable();
   resetButton.disable();
-  statusMessage.update("⏳ Uploading files...");
+  statusMessage.update('⏳ Uploading files...');
 
   // Upload
   const tasksToPoll = await sendFiles(filesToUpload);
@@ -175,16 +174,25 @@ async function handleSubmit(event) {
     bar: false,
     text: true,
   });
-  statusMessage.update("✅ Files uploaded");
+  statusMessage.update('✅ Files uploaded');
 
   const tasksCompleted = await pollFiles(tasksToPoll);
 
-  statusMessage.update("🚀 Files available to download");
+  tasksCompleted.forEach((task) => {
+    tasksToDownload.push(task);
+  });
+
+  statusMessage.update('🚀 Files available to download');
 
   resetButton.enable();
+}
 
-  // store tasksCompleted globally
-  // return tasksCompleted;
+async function handleDownload() {
+  downloadButton.disable();
+  resetButton.disable();
+  await downloadFiles(tasksToDownload);
+  downloadButton.enable();
+  resetButton.enable();
 }
 
 //#######################################################################
@@ -193,28 +201,23 @@ async function handleSubmit(event) {
 
 async function sendFiles(files) {
   const progresses = Array.from(
-    filePreviews.pointer.querySelectorAll("progress")
+    filePreviews.pointer.querySelectorAll('progress')
   );
-  const buttons = Array.from(filePreviews.pointer.querySelectorAll("button"));
-  const statuses = Array.from(filePreviews.pointer.querySelectorAll("span"));
+  const buttons = Array.from(filePreviews.pointer.querySelectorAll('button'));
+  const statuses = Array.from(filePreviews.pointer.querySelectorAll('span'));
 
   const uploadTasks = [];
   const tasksToPoll = [];
 
   files.forEach((file, index) => {
     uploadTasks.push(
-      createFileUploadTask(
-        file,
-        progresses[index],
-        buttons[index],
-        statuses[index]
-      )
+      createUploadTask(file, progresses[index], buttons[index], statuses[index])
     );
   });
 
   const uploadResults = await Promise.allSettled(uploadTasks);
   uploadResults.forEach((result, index) => {
-    if (result.status === "fulfilled") {
+    if (result.status === 'fulfilled') {
       filesToDownload.push(filesToUpload[index].name);
       tasksToPoll.push(result.value);
     } else {
@@ -226,20 +229,20 @@ async function sendFiles(files) {
 }
 
 async function pollFiles(tasks) {
-  const statuses = Array.from(filePreviews.pointer.querySelectorAll("span"));
+  const statuses = Array.from(filePreviews.pointer.querySelectorAll('span'));
 
   const pollTasks = [];
   const tasksCompleted = [];
 
   tasks.forEach((task, index) => {
-    pollTasks.push(createFilePollingTask(task, statuses[index]));
+    pollTasks.push(createPollingTask(task, statuses[index]));
   });
 
   const pollResults = await Promise.allSettled(pollTasks);
 
   const indexToRemove = [];
   pollResults.forEach((result, index) => {
-    if (result.status === "fulfilled") {
+    if (result.status === 'fulfilled') {
       tasksCompleted.push(result.value);
     } else {
       filesNotCompleted.push(filesToDownload[index]);
@@ -251,24 +254,23 @@ async function pollFiles(tasks) {
     .forEach((index) => {
       filesToDownload.splice(index, 1);
     });
-  console.log(filesToDownload);
   return tasksCompleted;
 }
 
 async function downloadFiles(tasks) {
-  const statuses = Array.from(filePreviews.pointer.querySelectorAll("span"));
+  const statuses = Array.from(filePreviews.pointer.querySelectorAll('span'));
 
   const downloadTasks = [];
   tasks.forEach((task, index) => {
     downloadTasks.push(
-      createFileDownloadTask(task, filesToDownload[index], statuses[index])
+      createDownloadTask(task, filesToDownload[index], statuses[index])
     );
   });
 
-  const downloadResults = await Promise.allSettled(downloadTasks);
+  await Promise.allSettled(downloadTasks);
 }
 //#######################################################################
-function createFileUploadTask(file, progress, button, status) {
+function createUploadTask(file, progress, button, status) {
   return new Promise((resolve, reject) => {
     const deleteButton = new components.HidableElement(button);
     const progressBar = new components.ProgressBar(progress);
@@ -277,10 +279,10 @@ function createFileUploadTask(file, progress, button, status) {
     const statusTextHidable = new components.HidableElement(status);
 
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append('file', file);
 
-    const url = "https://filetools13.pdf24.org/client.php?action=upload";
-    const method = "POST";
+    const url = 'https://filetools13.pdf24.org/client.php?action=upload';
+    const method = 'POST';
     const xhr = new XMLHttpRequest();
 
     // Configure XMLHttpRequest
@@ -296,29 +298,29 @@ function createFileUploadTask(file, progress, button, status) {
     };
 
     xhr.onerror = () => {
-      statusText.update("⚠️ failed to upload");
-      reject("Network error while uploading file:", file.name);
+      statusText.update('⚠️ failed to upload');
+      reject('Network error while uploading file:', file.name);
     };
 
     xhr.onload = async () => {
       progressBarHidable.hide();
       statusTextHidable.show();
       if (xhr.status < 300 && xhr.status >= 200) {
-        statusText.update("✔️ uploaded");
+        statusText.update('✔️ uploaded');
         // Parse response object
         const response = JSON.parse(xhr.responseText);
         // Start file compression job
         try {
           const ongoingTask = await signalTaskStart(response);
-          statusText.update("♻️ starting");
+          statusText.update('♻️ starting');
           resolve(ongoingTask);
         } catch (error) {
-          statusText.update("⭕️ failed to start compression");
-          reject("Error: " + error.message);
+          statusText.update('⭕️ failed to start compression');
+          reject('Error: ' + error.message);
         }
       } else {
-        statusText.update("❌ failed to upload");
-        reject("Error: " + xhr.status);
+        statusText.update('❌ failed to upload');
+        reject('Error: ' + xhr.status);
       }
     };
 
@@ -327,7 +329,7 @@ function createFileUploadTask(file, progress, button, status) {
   });
 }
 
-function createFilePollingTask(data, status) {
+function createPollingTask(data, status) {
   return new Promise((resolve, reject) => {
     const statusText = new components.StatusText(status);
     const statusTextHidable = new components.HidableElement(status);
@@ -336,13 +338,13 @@ function createFilePollingTask(data, status) {
     const pollTimeout = 2 * pollInterval;
 
     statusTextHidable.show();
-    statusText.update("🟡 compressing");
+    statusText.update('🟡 compressing');
 
     let randNum;
 
     const mockTimeout = setTimeout(() => {
       clearInterval(mockPolling);
-      statusText.update("🔴 too long to complete");
+      statusText.update('🟠 task took too long to complete');
       reject();
     }, pollTimeout);
 
@@ -351,7 +353,7 @@ function createFilePollingTask(data, status) {
       if (randNum >= 5) {
         clearTimeout(mockTimeout);
         clearInterval(mockPolling);
-        statusText.update("🟢 ready to download");
+        statusText.update('🟢 ready to download');
         resolve(data);
       }
     }, pollInterval);
@@ -403,20 +405,20 @@ function createFilePollingTask(data, status) {
   });
 }
 
-function createFileDownloadTask(data, fileName, status) {
+function createDownloadTask(data, fileName, status) {
   return new Promise((resolve, reject) => {
     const statusText = new components.StatusText(status);
 
-    const url = `https://filetools13.pdf24.org/client.php?mode=download&action=downloadResult&jobId=${data.jobId}`;
-    const method = "GET";
+    const url = `https://filetools13.pdf24.org/client.php?mode=download&action=downloadJobResult&jobId=${data.jobId}`;
+    const method = 'GET';
     const xhr = new XMLHttpRequest();
 
     // Configure XMLHttpRequest
     xhr.open(method, url);
-    xhr.responseType = "blob";
+    xhr.responseType = 'blob';
 
     xhr.onloadstart = () => {
-      statusText.update("📀 downloading");
+      statusText.update('📀 downloading');
     };
 
     xhr.upload.onprogress = (event) => {
@@ -426,17 +428,17 @@ function createFileDownloadTask(data, fileName, status) {
     };
 
     xhr.onerror = () => {
-      statusText.update("⚠️ failed to download");
-      reject("Network error while downloading file:", fileName);
+      statusText.update('⚠️ failed to download');
+      reject('Network error while downloading file:', fileName);
     };
 
     xhr.onload = () => {
       if (xhr.status < 300 && xhr.status >= 200) {
         // Create a temporary anchor element to trigger the download
         const downloadUrl = window.URL.createObjectURL(xhr.response);
-        const downloadLink = document.createElement("a");
+        const downloadLink = document.createElement('a');
         downloadLink.href = downloadUrl;
-        downloadLink.download = fileName + "_compressed";
+        downloadLink.download = fileName + '_compressed';
         document.body.appendChild(downloadLink);
         downloadLink.click();
 
@@ -444,11 +446,11 @@ function createFileDownloadTask(data, fileName, status) {
         document.body.removeChild(downloadLink);
         window.URL.revokeObjectURL(downloadUrl);
 
-        statusText.update("💽 downloaded");
+        statusText.update('💽 downloaded');
         resolve();
       } else {
-        statusText.update("❌ failed to download");
-        reject("Error: " + xhr.status);
+        statusText.update('❌ failed to download');
+        reject('Error: ' + xhr.status);
       }
     };
 
@@ -465,20 +467,20 @@ function signalTaskStart(data) {
       files: data,
       dpi: parseInt(options.dpi),
       imageQuality: parseInt(options.imgQuality),
-      mode: "normal",
-      colorModel: options.grayScale ? "gray" : "",
+      mode: 'normal',
+      colorModel: options.grayScale ? 'gray' : '',
     });
 
-    const url = "https://filetools13.pdf24.org/client.php?action=compressPdf";
-    const method = "POST";
+    const url = 'https://filetools13.pdf24.org/client.php?action=compressPdf';
+    const method = 'POST';
     const xhr = new XMLHttpRequest();
 
     // Configure XMLHttpRequest
     xhr.open(method, url);
-    xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 
     xhr.onerror = () => {
-      reject("Network error while trying to start file compression");
+      reject('Network error while trying to start file compression');
       // throw new Error('unable to start compression');
     };
 
@@ -487,7 +489,7 @@ function signalTaskStart(data) {
         const response = JSON.parse(xhr.responseText);
         resolve(response);
       } else {
-        reject("unable to start compression");
+        reject('unable to start compression');
       }
     };
 
