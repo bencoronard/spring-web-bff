@@ -5,6 +5,8 @@ const filesToDownload = [];
 const tasksToDownload = [];
 const indicesToDownload = [];
 
+const application = document.getElementById('application');
+
 const downloadButton = new components.DynamicButton(
   document.getElementById('downloadButton')
 );
@@ -102,6 +104,8 @@ const appStateTracker = new MutationObserver((mutationsList) => {
 //###################     INITIALIZATIONS    ############################
 //#######################################################################
 
+application.classList.remove('hidden');
+
 selectButton.addClickHandle(() => {
   fileInput.click();
 });
@@ -188,6 +192,7 @@ async function handleSubmit(event) {
   event.preventDefault();
 
   submitButton.disable();
+  fileOptions.hide();
 
   statusMessage.update('⏳ Uploading files...');
 

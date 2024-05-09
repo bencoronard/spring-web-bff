@@ -69,7 +69,13 @@
             PDF compressor to reduce the size of PDF files quickly and easily
           </p>
 
-          <form class="flex-vertical">
+          <noscript
+            ><h3>
+              ❗️❗️Please enable JavaScript to use the tool❗️❗️
+            </h3></noscript
+          >
+
+          <form class="flex-vertical hidden" id="application">
             <div id="dropZone" class="drop-area flex-vertical faded-bg">
               <ol id="stageList" class="flex-horizontal flex-spread">
                 <li class="stage">
@@ -81,7 +87,7 @@
                 <li class="stage"><span class="stage-check"></span>3. Done</li>
               </ol>
 
-              <p id="statusMessage">🤷‍♂ Nothing's upload</p>
+              <p id="statusMessage"></p>
 
               <ul id="filePreviews"></ul>
 
