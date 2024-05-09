@@ -328,7 +328,7 @@ function createPollingTask(data, status) {
     const statusTextHidable = new components.HidableElement(status);
 
     const pollInterval = 1000;
-    const pollTimeout = 2 * pollInterval;
+    const pollTimeout = 5 * pollInterval;
 
     statusTextHidable.show();
     statusText.update('🟡 compressing');
