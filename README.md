@@ -1,4 +1,3 @@
-# Information
+#Project Information
 
-This is a test project to build a web application to connect with a third-party pdf-compression API.
-You can access and test the web application the on GitHub page of this repository via this [link](https://bencoronard.github.io/pdf-compressor/).
+This project is a test web application designed to interact with a third-party PDF compression API. You can explore and test the application on the GitHub Pages of this repository using the following [link](https://bencoronard.github.io/pdf-compressor/).
