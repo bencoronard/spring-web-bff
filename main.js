@@ -227,8 +227,13 @@ async function handleSubmit(event) {
 async function handleDownload() {
   downloadButton.disable();
   resetButton.disable();
-  // try {}catch(errpr){}
-  await downloadFiles(tasksToDownload);
+  const filesNotDownloaded = await downloadFiles(tasksToDownload);
+  if (filesNotDownloaded.length) {
+    statusMessage.update('❗️❗️❗️ Files unable to download:');
+    filesNotDownloaded.forEach((file) => {
+      statusMessage.pointer.innerText += '\n' + '🔸' + file;
+    });
+  }
   downloadButton.enable();
   resetButton.enable();
 }
@@ -287,7 +292,7 @@ async function pollFiles(tasks) {
       indexToRemove.push(index);
     }
   });
-  // Here
+
   indexToRemove
     .sort((a, b) => b - a)
     .forEach((index) => {
@@ -311,7 +316,17 @@ async function downloadFiles(tasks) {
     );
   });
 
-  await Promise.allSettled(downloadTasks);
+  const filesNotDownloaded = [];
+
+  const downloadResults = await Promise.allSettled(downloadTasks);
+
+  downloadResults.forEach((result) => {
+    if (result.status === 'rejected') {
+      filesNotDownloaded.push(result.reason);
+    }
+  });
+
+  return filesNotDownloaded;
 }
 //#######################################################################
 function createUploadTask(file, progress, button, status) {
@@ -493,8 +508,8 @@ function createDownloadTask(data, fileName, status) {
         statusText.update('💽 downloaded');
         resolve();
       } else {
-        statusText.update('❌ failed to download');
-        reject('Error: ' + xhr.status);
+        statusText.update('❌ failed to download the file');
+        reject(fileName);
       }
     };
 
