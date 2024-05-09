@@ -295,6 +295,7 @@ form button {
   border: none;
   border-radius: 5px;
   font-size: var(--f-base);
+  cursor: pointer;
 }
 form button:hover {
   background-color: var(--c-s600);
@@ -302,6 +303,7 @@ form button:hover {
 form button:disabled {
   background-color: var(--c-g600);
   color: var(--c-g700);
+  cursor: initial;
 }
 
 #filePreviews {
@@ -585,5 +587,5 @@ footer section:nth-child(2) ul {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }

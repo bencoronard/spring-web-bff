@@ -67,24 +67,7 @@ const appStateTracker = new MutationObserver((mutationsList) => {
       const b = filesToDownload.length > 0 ? 1 : 0;
       switch (`${a}${b}`) {
         case '00':
-          stageList.setStage(0);
-
-          submitButton.disable();
-          submitButtonHidable.hide();
-
-          selectButton.enable();
-          selectButtonHidable.show();
-
-          resetButton.disable();
-          resetButtonHidable.hide();
-
-          downloadButton.disable();
-          downloadButtonHidable.hide();
-
-          otherTools.hide();
-          fileOptions.hide();
-          fileDropZone.enable();
-          statusMessage.update(``);
+          resetAppState();
           break;
         case '10':
           stageList.setStage(1);
@@ -104,15 +87,11 @@ const appStateTracker = new MutationObserver((mutationsList) => {
           submitButtonHidable.hide();
 
           resetButton.enable();
-          resetButtonHidable.show();
-
           downloadButton.enable();
-          downloadButtonHidable.show();
 
           fileDropZone.disable();
 
           fileOptions.hide();
-          otherTools.show();
           break;
       }
     }
@@ -135,9 +114,9 @@ fileInput.addEventListener('change', () => {
   handleFileUpload(fileInput.files);
 });
 
-appStateTracker.observe(filePreviews.pointer, { childList: true });
-
 resetAppState();
+
+appStateTracker.observe(filePreviews.pointer, { childList: true });
 
 //#######################################################################
 //###################      APP STATE FUNCTIONS      #####################
@@ -145,11 +124,11 @@ resetAppState();
 function resetAppState() {
   stageList.setStage(0);
 
-  submitButton.disable();
-  submitButtonHidable.hide();
-
   selectButton.enable();
   selectButtonHidable.show();
+
+  submitButton.disable();
+  submitButtonHidable.hide();
 
   resetButton.disable();
   resetButtonHidable.hide();
@@ -166,14 +145,6 @@ function resetAppState() {
   filesToDownload.splice(0);
   fileInput.value = '';
   statusMessage.update(``);
-
-  // selectButton.enable();
-  // submitButton.disable();
-  // resetButton.disable();
-  // downloadButton.disable();
-  // fileDropZone.enable();
-  // stageList.reset();
-  // fileOptions.hide();
 }
 
 function handleFileUpload(uploadedFiles) {
@@ -212,11 +183,8 @@ function extractFiles(fileList) {
 async function handleSubmit(event) {
   event.preventDefault();
 
-  // Disable buttons
   submitButton.disable();
-  fileOptions.hide();
-  selectButton.disable();
-  resetButton.disable();
+
   statusMessage.update('⏳ Uploading files...');
 
   // Upload
@@ -238,7 +206,9 @@ async function handleSubmit(event) {
 
   statusMessage.update('🚀 Files available to download');
 
-  resetButton.enable();
+  downloadButtonHidable.show();
+  resetButtonHidable.show();
+  otherTools.show();
 }
 
 async function handleDownload() {
@@ -308,6 +278,7 @@ async function pollFiles(tasks) {
     .forEach((index) => {
       filesToDownload.splice(index, 1);
     });
+
   return tasksCompleted;
 }
 
@@ -404,7 +375,7 @@ function createPollingTask(data, status) {
 
     const mockPolling = setInterval(() => {
       randNum = Math.floor(Math.random() * 10) + 1;
-      if (randNum >= 5) {
+      if (randNum >= 8) {
         clearTimeout(mockTimeout);
         clearInterval(mockPolling);
         statusText.update('🟢 ready to download');
@@ -535,7 +506,6 @@ function signalTaskStart(data) {
 
     xhr.onerror = () => {
       reject('Network error while trying to start file compression');
-      // throw new Error('unable to start compression');
     };
 
     xhr.onload = () => {
