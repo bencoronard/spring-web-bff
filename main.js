@@ -2,8 +2,8 @@ import * as components from './modules/components.js';
 
 const filesToUpload = [];
 const filesToDownload = [];
-const filesNotCompleted = [];
 const tasksToDownload = [];
+const indicesToDownload = [];
 
 const downloadButton = new components.DynamicButton(
   document.getElementById('downloadButton')
@@ -119,7 +119,7 @@ resetAppState();
 appStateTracker.observe(filePreviews.pointer, { childList: true });
 
 //#######################################################################
-//###################      APP STATE FUNCTIONS      #####################
+//####################      BUTTON FUNCTIONS      #######################
 //#######################################################################
 function resetAppState() {
   stageList.setStage(0);
@@ -141,9 +141,13 @@ function resetAppState() {
   fileDropZone.enable();
 
   filePreviews.clear();
+
   filesToUpload.splice(0);
   filesToDownload.splice(0);
+  tasksToDownload.splice(0);
+  indicesToDownload.splice(0);
   fileInput.value = '';
+
   statusMessage.update(``);
 }
 
@@ -198,22 +202,32 @@ async function handleSubmit(event) {
   });
   statusMessage.update('✅ Files uploaded');
 
-  const tasksCompleted = await pollFiles(tasksToPoll);
+  // Edit here
+  const { tasks: tasksCompleted, index: indexToDownload } = await pollFiles(
+    tasksToPoll
+  );
 
-  tasksCompleted.forEach((task) => {
+  tasksCompleted.forEach((task, index) => {
     tasksToDownload.push(task);
+    indicesToDownload.push(indexToDownload[index]);
   });
-
-  statusMessage.update('🚀 Files available to download');
 
   downloadButtonHidable.show();
   resetButtonHidable.show();
   otherTools.show();
+
+  if (!tasksCompleted.length) {
+    downloadButton.disable();
+    statusMessage.update('⛔️ Files not available to download');
+  } else {
+    statusMessage.update('🚀 Files available to download');
+  }
 }
 
 async function handleDownload() {
   downloadButton.disable();
   resetButton.disable();
+  // try {}catch(errpr){}
   await downloadFiles(tasksToDownload);
   downloadButton.enable();
   resetButton.enable();
@@ -244,8 +258,6 @@ async function sendFiles(files) {
     if (result.status === 'fulfilled') {
       filesToDownload.push(filesToUpload[index].name);
       tasksToPoll.push(result.value);
-    } else {
-      filesNotCompleted.push(filesToUpload[index].name);
     }
   });
   filesToUpload.splice(0);
@@ -265,21 +277,24 @@ async function pollFiles(tasks) {
   const pollResults = await Promise.allSettled(pollTasks);
 
   const indexToRemove = [];
+  const indexToDownload = [];
+
   pollResults.forEach((result, index) => {
     if (result.status === 'fulfilled') {
       tasksCompleted.push(result.value);
+      indexToDownload.push(index);
     } else {
-      filesNotCompleted.push(filesToDownload[index]);
       indexToRemove.push(index);
     }
   });
+  // Here
   indexToRemove
     .sort((a, b) => b - a)
     .forEach((index) => {
       filesToDownload.splice(index, 1);
     });
 
-  return tasksCompleted;
+  return { tasks: tasksCompleted, index: indexToDownload };
 }
 
 async function downloadFiles(tasks) {
@@ -288,7 +303,11 @@ async function downloadFiles(tasks) {
   const downloadTasks = [];
   tasks.forEach((task, index) => {
     downloadTasks.push(
-      createDownloadTask(task, filesToDownload[index], statuses[index])
+      createDownloadTask(
+        task,
+        filesToDownload[index],
+        statuses[indicesToDownload[index]]
+      )
     );
   });
 
