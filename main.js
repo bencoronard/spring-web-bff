@@ -8,14 +8,30 @@ const tasksToDownload = [];
 const downloadButton = new components.DynamicButton(
   document.getElementById('downloadButton')
 );
+const downloadButtonHidable = new components.HidableElement(
+  document.getElementById('downloadButton')
+);
 const resetButton = new components.DynamicButton(
+  document.getElementById('resetButton')
+);
+const resetButtonHidable = new components.HidableElement(
   document.getElementById('resetButton')
 );
 const selectButton = new components.DynamicButton(
   document.getElementById('selectButton')
 );
+const selectButtonHidable = new components.HidableElement(
+  document.getElementById('selectButton')
+);
 const submitButton = new components.DynamicButton(
   document.getElementById('submitButton')
+);
+const submitButtonHidable = new components.HidableElement(
+  document.getElementById('submitButton')
+);
+
+const otherTools = new components.HidableElement(
+  document.getElementById('other-tools')
 );
 
 const fileDropZone = new components.DropZone(
@@ -51,24 +67,52 @@ const appStateTracker = new MutationObserver((mutationsList) => {
       const b = filesToDownload.length > 0 ? 1 : 0;
       switch (`${a}${b}`) {
         case '00':
-          submitButton.disable();
-          resetButton.disable();
           stageList.setStage(0);
+
+          submitButton.disable();
+          submitButtonHidable.hide();
+
+          selectButton.enable();
+          selectButtonHidable.show();
+
+          resetButton.disable();
+          resetButtonHidable.hide();
+
+          downloadButton.disable();
+          downloadButtonHidable.hide();
+
+          otherTools.hide();
           fileOptions.hide();
+          fileDropZone.enable();
+          statusMessage.update(``);
           break;
         case '10':
-          submitButton.enable();
-          resetButton.enable();
           stageList.setStage(1);
+
+          submitButton.enable();
+          submitButtonHidable.show();
+
+          selectButton.disable();
+          selectButtonHidable.hide();
+
           fileOptions.show();
           break;
         case '01':
-          selectButton.disable();
-          submitButton.disable();
-          downloadButton.enable();
-          fileDropZone.disable();
           stageList.setStage(2);
+
+          submitButton.disable();
+          submitButtonHidable.hide();
+
+          resetButton.enable();
+          resetButtonHidable.show();
+
+          downloadButton.enable();
+          downloadButtonHidable.show();
+
+          fileDropZone.disable();
+
           fileOptions.hide();
+          otherTools.show();
           break;
       }
     }
@@ -91,28 +135,45 @@ fileInput.addEventListener('change', () => {
   handleFileUpload(fileInput.files);
 });
 
-resetAppState();
-
 appStateTracker.observe(filePreviews.pointer, { childList: true });
+
+resetAppState();
 
 //#######################################################################
 //###################      APP STATE FUNCTIONS      #####################
 //#######################################################################
 function resetAppState() {
+  stageList.setStage(0);
+
+  submitButton.disable();
+  submitButtonHidable.hide();
+
+  selectButton.enable();
+  selectButtonHidable.show();
+
+  resetButton.disable();
+  resetButtonHidable.hide();
+
+  downloadButton.disable();
+  downloadButtonHidable.hide();
+
+  otherTools.hide();
+  fileOptions.hide();
+  fileDropZone.enable();
+
+  filePreviews.clear();
   filesToUpload.splice(0);
   filesToDownload.splice(0);
   fileInput.value = '';
+  statusMessage.update(``);
 
-  filePreviews.clear();
-  selectButton.enable();
-  submitButton.disable();
-  resetButton.disable();
-  downloadButton.disable();
-  fileDropZone.enable();
-  stageList.reset();
-  fileOptions.hide();
-
-  statusMessage.update(`🤷‍♂ Nothing's uploaded`);
+  // selectButton.enable();
+  // submitButton.disable();
+  // resetButton.disable();
+  // downloadButton.disable();
+  // fileDropZone.enable();
+  // stageList.reset();
+  // fileOptions.hide();
 }
 
 function handleFileUpload(uploadedFiles) {
@@ -126,8 +187,8 @@ function handleFileUpload(uploadedFiles) {
     filesToUpload.map((file) => file.name),
     { button: true, bar: true, text: true }
   );
-  submitButton.enable();
 }
+
 function extractFiles(fileList) {
   const allowedTypes = ['application/pdf'];
   const existingFiles = filesToUpload.map((file) => file.name);
