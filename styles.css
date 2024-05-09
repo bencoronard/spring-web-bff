@@ -11,7 +11,9 @@
   font-weight: 700;
   font-style: normal;
 }
-
+/* ################################################# */
+/* ###################  General  ################### */
+/* ################################################# */
 *,
 *::before,
 *::after {
@@ -54,9 +56,6 @@
   --r-border: 0.5em;
   --t-animation: 200ms;
 }
-.this {
-  border: 1px dashed red;
-}
 html {
   font-size: var(--f-base);
 }
@@ -83,18 +82,31 @@ h6 {
   font-size: var(--f-h6);
 }
 
-.logo {
-  font-size: 35px;
-}
-.logo > span {
-  color: var(--c-p600);
-}
-
 .faded-bg {
   background-color: var(--c-p200);
 }
 .heavy-bg {
   background-color: var(--c-p600);
+}
+.filler {
+  flex: 1;
+}
+.container {
+  height: 100%;
+}
+.wrapper {
+  width: fit-content;
+  height: fit-content;
+}
+
+/* ################################################# */
+/* #################  Components  ################## */
+/* ################################################# */
+.logo {
+  font-size: 35px;
+}
+.logo > span {
+  color: var(--c-p600);
 }
 .slot {
   border: 1px solid var(--c-p600);
@@ -110,16 +122,6 @@ h6 {
   height: 100%;
 }
 
-.filler {
-  flex: 1;
-}
-.container {
-  height: 100%;
-}
-.wrapper {
-  width: fit-content;
-  height: fit-content;
-}
 .link-button {
   display: flex;
   justify-content: center;
@@ -175,7 +177,10 @@ h6 {
   justify-content: space-between;
 }
 
+/* ################################################# */
 /* #####################  APP  ##################### */
+/* ################################################# */
+
 .drop-area {
   width: 100%;
   min-height: 257px;
@@ -314,7 +319,6 @@ form button:disabled {
   gap: 1em;
   justify-content: center;
   flex: 1;
-  border: 1px dashed red;
 }
 .filePreviews-item {
   justify-content: center;
@@ -559,7 +563,14 @@ footer section:nth-child(2) ul {
   height: 49px;
   font-size: 19.2px;
 }
-#selectButton:disabled + span {
+#selectButton + .img-container {
+  order: -1;
+}
+#selectButton ~ span {
+  color: var(--c-g700);
+}
+#selectButton:disabled ~ span,
+#selectButton:disabled + .img-container {
   display: none;
 }
 #downloadButton {
