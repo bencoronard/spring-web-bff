@@ -11,9 +11,11 @@
   font-weight: 700;
   font-style: normal;
 }
+
 /* ################################################# */
 /* ###################  General  ################### */
 /* ################################################# */
+
 *,
 *::before,
 *::after {
@@ -98,10 +100,34 @@ h6 {
   width: fit-content;
   height: fit-content;
 }
+.centered {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.txtCentered {
+  text-align: center;
+}
+.flex-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.flex-horizontal {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.flex-spread {
+  justify-content: space-between;
+}
+.hidden {
+  display: none !important;
+}
 
 /* ################################################# */
 /* #################  Components  ################## */
 /* ################################################# */
+
 .logo {
   font-size: 35px;
 }
@@ -135,14 +161,7 @@ h6 {
 .link-button:hover {
   background-color: var(--c-p400);
 }
-.centered {
-  max-width: 1200px;
-  margin: 0 auto;
-}
 
-.txtCentered {
-  text-align: center;
-}
 .columns {
   column-count: 6;
   column-rule: 1px solid #ccc;
@@ -163,20 +182,43 @@ h6 {
   flex-direction: column;
   justify-content: space-between;
 }
-.flex-vertical {
+.moon {
+  width: 21px;
+  height: 21px;
+  background-image: url('./assets/moon.png');
+  background-size: cover;
+}
+.moon:hover {
+  background-image: url('./assets/moon-light.png');
+}
+.favorite {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 23px;
+  height: 23px;
+  background-image: url('./assets/fav-star.png');
+  background-size: cover;
+}
+.favorite:hover {
+  background-image: url('./assets/fav-star-yellow.png');
+}
+.mascot {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 78px;
+  height: 80px;
+}
+.img-container {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  width: fit-content;
 }
-.flex-horizontal {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+.img-container > img {
+  object-fit: cover;
 }
-.flex-spread {
-  justify-content: space-between;
-}
-
 /* ################################################# */
 /* #####################  APP  ##################### */
 /* ################################################# */
@@ -357,7 +399,95 @@ form {
   margin: 5em 0;
   gap: 1em;
 }
+#other-tools {
+  padding: 1em;
+  height: 146px;
+  width: min(100%, 1200px);
+  background-color: var(--c-p600);
+  border-radius: 12px 12px 0 0;
+  color: var(--c-white);
+  gap: 1em;
+}
+#other-tools .container {
+  width: 100%;
+  gap: 1em;
+}
+#other-tools .container .flex-horizontal {
+  position: relative;
+  border-radius: 4px;
+  border: 1px solid var(--c-p400);
+  height: 80px;
+  width: 219px;
+}
+#other-tools .wrapper .img-container {
+  width: 16.64px;
+  height: 18px;
+}
+#other-tools .img-container {
+  width: 68px;
+  height: 68px;
+}
+
+#buttons {
+  gap: 1em;
+}
+#buttons .wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  gap: 0.5em;
+}
+#submitButton {
+  width: 139px;
+  height: 32px;
+}
+#selectButton {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 181px;
+  height: 49px;
+  font-size: 19.2px;
+}
+#selectButton + .img-container {
+  order: -1;
+}
+#selectButton ~ span {
+  color: var(--c-g700);
+}
+#selectButton:disabled ~ span,
+#selectButton:disabled + .img-container {
+  display: none;
+}
+#downloadButton {
+  width: 127px;
+  height: 48px;
+}
+#resetButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5em;
+  width: 127px;
+  height: 48px;
+}
+
+.lag > .stage-check {
+  display: initial;
+}
+.stage-check {
+  display: none;
+  width: 17px;
+  height: 17px;
+  background-image: url(./assets/check-filled.png);
+  background-size: cover;
+}
+
 /* ################################################# */
+/* ###################  Others  #################### */
+/* ################################################# */
+
 footer {
   font-size: var(--f-small);
 }
@@ -421,24 +551,7 @@ header .heavy-bg .flex-horizontal .flex-horizontal {
 header .heavy-bg .flex-horizontal .flex-horizontal .wrapper {
   gap: 0.5em;
 }
-.moon {
-  width: 21px;
-  height: 21px;
-  background-image: url('./assets/moon.png');
-  background-size: cover;
-}
-.moon:hover {
-  background-image: url('./assets/moon-light.png');
-}
-.img-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: fit-content;
-}
-.img-container > img {
-  object-fit: cover;
-}
+
 header .wrapper {
   display: flex;
   gap: 0.25em;
@@ -470,14 +583,6 @@ main section:nth-child(3) .img-container img {
 main section:nth-child(3) div {
   padding: 0 1.25em 0 0;
 }
-
-.mascot {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 78px;
-  height: 80px;
-}
 main section:first-child {
   padding: 1em 1em 0 1em;
   position: relative;
@@ -499,104 +604,4 @@ footer section:first-child .centered ul {
 }
 footer section:nth-child(2) ul {
   margin-bottom: 1.5em;
-}
-
-#other-tools {
-  padding: 1em;
-  height: 146px;
-  width: min(100%, 1200px);
-  background-color: var(--c-p600);
-  border-radius: 12px 12px 0 0;
-  color: var(--c-white);
-  gap: 1em;
-}
-#other-tools .container {
-  width: 100%;
-  gap: 1em;
-}
-#other-tools .container .flex-horizontal {
-  position: relative;
-  border-radius: 4px;
-  border: 1px solid var(--c-p400);
-  height: 80px;
-  width: 219px;
-}
-#other-tools .wrapper .img-container {
-  width: 16.64px;
-  height: 18px;
-}
-#other-tools .img-container {
-  width: 68px;
-  height: 68px;
-}
-.favorite {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 23px;
-  height: 23px;
-  background-image: url('./assets/fav-star.png');
-  background-size: cover;
-}
-.favorite:hover {
-  background-image: url('./assets/fav-star-yellow.png');
-}
-#buttons {
-  gap: 1em;
-}
-#buttons .wrapper {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  gap: 0.5em;
-}
-#submitButton {
-  width: 139px;
-  height: 32px;
-}
-#selectButton {
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  width: 181px;
-  height: 49px;
-  font-size: 19.2px;
-}
-#selectButton + .img-container {
-  order: -1;
-}
-#selectButton ~ span {
-  color: var(--c-g700);
-}
-#selectButton:disabled ~ span,
-#selectButton:disabled + .img-container {
-  display: none;
-}
-#downloadButton {
-  width: 127px;
-  height: 48px;
-}
-#resetButton {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5em;
-  width: 127px;
-  height: 48px;
-}
-
-.lag > .stage-check {
-  display: initial;
-}
-.stage-check {
-  display: none;
-  width: 17px;
-  height: 17px;
-  background-image: url(./assets/check-filled.png);
-  background-size: cover;
-}
-
-.hidden {
-  display: none !important;
 }
