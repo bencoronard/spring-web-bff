@@ -8,14 +8,30 @@ const tasksToDownload = [];
 const downloadButton = new components.DynamicButton(
   document.getElementById('downloadButton')
 );
+const downloadButtonHidable = new components.HidableElement(
+  document.getElementById('downloadButton')
+);
 const resetButton = new components.DynamicButton(
+  document.getElementById('resetButton')
+);
+const resetButtonHidable = new components.HidableElement(
   document.getElementById('resetButton')
 );
 const selectButton = new components.DynamicButton(
   document.getElementById('selectButton')
 );
+const selectButtonHidable = new components.HidableElement(
+  document.getElementById('selectButton')
+);
 const submitButton = new components.DynamicButton(
   document.getElementById('submitButton')
+);
+const submitButtonHidable = new components.HidableElement(
+  document.getElementById('submitButton')
+);
+
+const otherTools = new components.HidableElement(
+  document.getElementById('other-tools')
 );
 
 const fileDropZone = new components.DropZone(
@@ -51,23 +67,30 @@ const appStateTracker = new MutationObserver((mutationsList) => {
       const b = filesToDownload.length > 0 ? 1 : 0;
       switch (`${a}${b}`) {
         case '00':
-          submitButton.disable();
-          resetButton.disable();
-          stageList.setStage(0);
-          fileOptions.hide();
+          resetAppState();
           break;
         case '10':
-          submitButton.enable();
-          resetButton.enable();
           stageList.setStage(1);
+
+          submitButton.enable();
+          submitButtonHidable.show();
+
+          selectButton.disable();
+          selectButtonHidable.hide();
+
           fileOptions.show();
           break;
         case '01':
-          selectButton.disable();
-          submitButton.disable();
-          downloadButton.enable();
-          fileDropZone.disable();
           stageList.setStage(2);
+
+          submitButton.disable();
+          submitButtonHidable.hide();
+
+          resetButton.enable();
+          downloadButton.enable();
+
+          fileDropZone.disable();
+
           fileOptions.hide();
           break;
       }
@@ -99,20 +122,29 @@ appStateTracker.observe(filePreviews.pointer, { childList: true });
 //###################      APP STATE FUNCTIONS      #####################
 //#######################################################################
 function resetAppState() {
+  stageList.setStage(0);
+
+  selectButton.enable();
+  selectButtonHidable.show();
+
+  submitButton.disable();
+  submitButtonHidable.hide();
+
+  resetButton.disable();
+  resetButtonHidable.hide();
+
+  downloadButton.disable();
+  downloadButtonHidable.hide();
+
+  otherTools.hide();
+  fileOptions.hide();
+  fileDropZone.enable();
+
+  filePreviews.clear();
   filesToUpload.splice(0);
   filesToDownload.splice(0);
   fileInput.value = '';
-
-  filePreviews.clear();
-  selectButton.enable();
-  submitButton.disable();
-  resetButton.disable();
-  downloadButton.disable();
-  fileDropZone.enable();
-  stageList.reset();
-  fileOptions.hide();
-
-  statusMessage.update(`🤷‍♂ Nothing's uploaded`);
+  statusMessage.update(``);
 }
 
 function handleFileUpload(uploadedFiles) {
@@ -126,8 +158,8 @@ function handleFileUpload(uploadedFiles) {
     filesToUpload.map((file) => file.name),
     { button: true, bar: true, text: true }
   );
-  submitButton.enable();
 }
+
 function extractFiles(fileList) {
   const allowedTypes = ['application/pdf'];
   const existingFiles = filesToUpload.map((file) => file.name);
@@ -151,11 +183,8 @@ function extractFiles(fileList) {
 async function handleSubmit(event) {
   event.preventDefault();
 
-  // Disable buttons
   submitButton.disable();
-  fileOptions.hide();
-  selectButton.disable();
-  resetButton.disable();
+
   statusMessage.update('⏳ Uploading files...');
 
   // Upload
@@ -177,7 +206,9 @@ async function handleSubmit(event) {
 
   statusMessage.update('🚀 Files available to download');
 
-  resetButton.enable();
+  downloadButtonHidable.show();
+  resetButtonHidable.show();
+  otherTools.show();
 }
 
 async function handleDownload() {
@@ -247,6 +278,7 @@ async function pollFiles(tasks) {
     .forEach((index) => {
       filesToDownload.splice(index, 1);
     });
+
   return tasksCompleted;
 }
 
@@ -343,7 +375,7 @@ function createPollingTask(data, status) {
 
     const mockPolling = setInterval(() => {
       randNum = Math.floor(Math.random() * 10) + 1;
-      if (randNum >= 5) {
+      if (randNum >= 8) {
         clearTimeout(mockTimeout);
         clearInterval(mockPolling);
         statusText.update('🟢 ready to download');
@@ -474,7 +506,6 @@ function signalTaskStart(data) {
 
     xhr.onerror = () => {
       reject('Network error while trying to start file compression');
-      // throw new Error('unable to start compression');
     };
 
     xhr.onload = () => {
