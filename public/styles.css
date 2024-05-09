@@ -183,6 +183,7 @@ h6 {
   border-radius: 20px;
   align-items: center;
   padding: 0.5em;
+  position: relative;
 }
 
 .highlight {
@@ -190,16 +191,16 @@ h6 {
   border: 1px dashed var(--c-p500);
 }
 .lowlight {
-  background-color: var(--c-g600);
-  border: 1px dashed var(--c-g700);
+  background-color: var(--c-p400);
+  border: 1px dashed var(--c-p700);
 }
 
 #options {
   border: 1px solid var(--c-p400);
   border-radius: 4px;
   width: min(100%, 721px);
+  padding: 1em;
 }
-
 #options .flex-vertical {
   gap: 0.5em;
 }
@@ -223,6 +224,10 @@ h6 {
   width: min(530px, 100%);
 }
 
+#options > .container:nth-child(2) {
+  margin-top: 1em;
+}
+
 #stageList {
   width: 100%;
 }
@@ -230,9 +235,14 @@ h6 {
   border: 1px solid var(--c-g600);
   color: var(--c-g600);
   border-radius: 30px;
-  padding: 0.25em;
+  padding: 0 1em;
   font-size: var(--f-small);
   font-weight: 700;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 32px;
+  gap: 0.5em;
 }
 
 .colored {
@@ -284,6 +294,7 @@ form button {
   background-color: var(--c-s500);
   border: none;
   border-radius: 5px;
+  font-size: var(--f-base);
 }
 form button:hover {
   background-color: var(--c-s600);
@@ -301,6 +312,7 @@ form button:disabled {
   gap: 1em;
   justify-content: center;
   flex: 1;
+  border: 1px dashed red;
 }
 .filePreviews-item {
   justify-content: center;
@@ -523,6 +535,55 @@ footer section:nth-child(2) ul {
 .favorite:hover {
   background-image: url('./assets/fav-star-yellow.png');
 }
+#buttons {
+  gap: 1em;
+}
+#buttons .wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  gap: 0.5em;
+}
+#submitButton {
+  width: 139px;
+  height: 32px;
+}
+#selectButton {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 181px;
+  height: 49px;
+  font-size: 19.2px;
+}
+#selectButton:disabled + span {
+  display: none;
+}
+#downloadButton {
+  width: 127px;
+  height: 48px;
+}
+#resetButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5em;
+  width: 127px;
+  height: 48px;
+}
+
+.lag > .stage-check {
+  display: initial;
+}
+.stage-check {
+  display: none;
+  width: 17px;
+  height: 17px;
+  background-image: url(./assets/check-filled.png);
+  background-size: cover;
+}
+
 .hidden {
   display: none;
 }

@@ -72,9 +72,13 @@
           <form class="flex-vertical">
             <div id="dropZone" class="drop-area flex-vertical faded-bg">
               <ol id="stageList" class="flex-horizontal flex-spread">
-                <li class="stage">1. Upload files</li>
-                <li class="stage">2. Choose compression</li>
-                <li class="stage">3. Done</li>
+                <li class="stage">
+                  <span class="stage-check"></span>1. Upload files
+                </li>
+                <li class="stage">
+                  <span class="stage-check"></span>2. Choose compression
+                </li>
+                <li class="stage"><span class="stage-check"></span>3. Done</li>
               </ol>
 
               <p id="statusMessage">🤷‍♂ Nothing's upload</p>
@@ -89,10 +93,26 @@
                 accept="application/pdf"
               />
 
-              <div id="buttons">
-                <button id="selectButton" type="button">Select files</button>
+              <div id="buttons" class="flex-horizontal">
+                <div class="wrapper flex-vertical">
+                  <span class="img-container"
+                    ><img src="./assets/page.png" alt="File"
+                  /></span>
+                  <button id="selectButton" type="button">
+                    <span>Select files</span>
+                    <span>|</span>
+                    <span class="img-container"
+                      ><img src="./assets/arrow_down.png" alt="Arrow down"
+                    /></span>
+                  </button>
+                  <span>or drag and drop file into this area</span>
+                </div>
                 <button id="downloadButton" type="button">Download</button>
-                <button id="resetButton" type="reset">Restart</button>
+                <button id="resetButton" type="reset">
+                  <span class="img-container"
+                    ><img src="./assets/restart.png" alt="Restart" /></span
+                  ><span>Restart</span>
+                </button>
               </div>
             </div>
 

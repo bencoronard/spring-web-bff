@@ -170,14 +170,19 @@ export class ChromaticList {
 
   addColor(index) {
     this.pointer.children[index].classList.add('colored');
+    if (index > 0) {
+      this.pointer.children[index - 1].classList.add('lag');
+    }
   }
   removeColor(index) {
     this.pointer.children[index].classList.remove('colored');
+    if (index > 0) {
+      this.pointer.children[index - 1].classList.remove('lag');
+    }
   }
 
   setStage(stage) {
     this.reset();
-    const children = this.pointer.children;
     const limit = Math.min(stage, this.numChild - 1);
     for (let i = 1; i <= limit; i++) {
       this.addColor(i);
@@ -185,7 +190,6 @@ export class ChromaticList {
   }
 
   reset() {
-    const children = this.pointer.children;
     for (let i = 1; i < this.numChild; i++) {
       this.removeColor(i);
     }
