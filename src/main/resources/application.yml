@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: "${DEMO_SERVICE_REST_WEB_BFF_ID:REST_WEB_BFF}"
