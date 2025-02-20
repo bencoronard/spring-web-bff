@@ -1,6 +1,5 @@
 package dev.hireben.demo.rest.web.bff.application.dto;
 
-import dev.hireben.demo.rest.web.bff.domain.model.Tenant;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -16,7 +15,7 @@ public class UserDTO {
   private final String badgeId;
   private final String firstName;
   private final String lastName;
-  private final Tenant tenant;
+  private final String tenant;
   private final String position;
   private final String roleId;
 

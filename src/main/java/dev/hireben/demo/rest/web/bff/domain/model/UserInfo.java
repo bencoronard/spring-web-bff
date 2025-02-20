@@ -15,7 +15,7 @@ public class UserInfo {
   private final String badgeId;
   private final String firstName;
   private final String lastName;
-  private final Tenant tenant;
+  private final String tenant;
   private final String position;
   private final String roleId;
 
