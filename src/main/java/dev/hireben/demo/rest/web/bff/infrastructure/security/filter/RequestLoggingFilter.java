@@ -39,7 +39,7 @@ public class RequestLoggingFilter extends CommonsRequestLoggingFilter {
 
   @Override
   protected boolean shouldLog(@NonNull HttpServletRequest request) {
-    return this.shouldLog;
+    return shouldLog;
   }
 
   // ---------------------------------------------------------------------------//
