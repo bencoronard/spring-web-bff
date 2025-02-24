@@ -8,10 +8,11 @@ import org.springframework.context.annotation.Configuration;
 import dev.hireben.demo.rest.web.bff.infrastructure.security.filter.ApiKeyFilter;
 import dev.hireben.demo.rest.web.bff.infrastructure.security.filter.RequestLoggingFilter;
 import dev.hireben.demo.rest.web.bff.utility.EnvironmentUtil;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class FilterConfig {
 
   // ---------------------------------------------------------------------------//

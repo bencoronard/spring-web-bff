@@ -16,7 +16,7 @@ public class EnvironmentUtil {
   // Constructors
   // ---------------------------------------------------------------------------//
 
-  public EnvironmentUtil(@Value("${spring.profiles.active}") String env) {
+  protected EnvironmentUtil(@Value("${spring.profiles.active}") String env) {
     isDev = "dev".equalsIgnoreCase(env);
   }
 

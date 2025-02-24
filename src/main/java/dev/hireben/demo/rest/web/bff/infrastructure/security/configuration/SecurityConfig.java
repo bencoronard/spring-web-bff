@@ -6,10 +6,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
 import dev.hireben.demo.rest.web.bff.utility.EnvironmentUtil;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class SecurityConfig {
 
   // ---------------------------------------------------------------------------//
