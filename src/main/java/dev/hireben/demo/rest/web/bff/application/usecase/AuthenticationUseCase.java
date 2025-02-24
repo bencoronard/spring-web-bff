@@ -24,7 +24,7 @@ public class AuthenticationUseCase {
   public UserDTO authenticate(AuthenticationDTO dto) {
 
     UserInfo user = authenticationService.authenticate(dto.getUsername(), dto.getPassword())
-        .orElseThrow(() -> new UserAuthenticationException("Failed to authenticate user"));
+        .orElseThrow(() -> new UserAuthenticationException("Invalid credentials"));
 
     return UserInfoMapper.toDto(user);
   }
