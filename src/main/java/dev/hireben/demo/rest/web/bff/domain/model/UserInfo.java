@@ -1,9 +1,9 @@
 package dev.hireben.demo.rest.web.bff.domain.model;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 @Builder
 public class UserInfo {
 
@@ -11,12 +11,12 @@ public class UserInfo {
   // Fields
   // ---------------------------------------------------------------------------//
 
-  private final String id;
-  private final String badgeId;
-  private final String firstName;
-  private final String lastName;
-  private final String tenant;
-  private final String position;
-  private final String roleId;
+  String id;
+  String firstName;
+  String lastName;
+  String badgeNum;
+  String position;
+  String roleId;
+  String tenant;
 
 }

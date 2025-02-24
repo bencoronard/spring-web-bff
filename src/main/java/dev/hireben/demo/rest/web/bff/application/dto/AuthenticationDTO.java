@@ -1,18 +1,17 @@
 package dev.hireben.demo.rest.web.bff.application.dto;
 
-import java.time.Instant;
-
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Value;
 
+@Value
 @Builder
-@Getter
-public class UpdateUserSessionDTO {
+public class AuthenticationDTO {
 
   // ---------------------------------------------------------------------------//
   // Fields
   // ---------------------------------------------------------------------------//
 
-  private final Instant expiresAt;
+  String username;
+  String password;
 
 }

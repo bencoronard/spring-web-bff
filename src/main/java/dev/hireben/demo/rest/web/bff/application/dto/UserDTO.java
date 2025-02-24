@@ -1,22 +1,22 @@
 package dev.hireben.demo.rest.web.bff.application.dto;
 
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Value;
 
+@Value
 @Builder
-@Getter
 public class UserDTO {
 
   // ---------------------------------------------------------------------------//
   // Fields
   // ---------------------------------------------------------------------------//
 
-  private final String id;
-  private final String badgeId;
-  private final String firstName;
-  private final String lastName;
-  private final String tenant;
-  private final String position;
-  private final String roleId;
+  String id;
+  String firstName;
+  String lastName;
+  String badgeNum;
+  String position;
+  String roleId;
+  String tenant;
 
 }
