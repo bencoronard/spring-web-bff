@@ -1,3 +1,122 @@
+server:
+  port: "${APP_SERVER_PORT:8080}"
+  secret-key: "${DEMO_SERVICE_BFF_SECRET_KEY:hireBenDemoSecretKey}"
+  key-pair:
+    public: "${DEMO_SERVICE_BFF_PUBLIC_KEY}"
+    private: "${DEMO_SERVICE_BFF_PRIVATE_KEY}"
+  error:
+    whitelabel:
+      enabled: false
+  servlet:
+    session:
+      timeout: "${DEMO_SERVICE_BFF_SESSION_TIMEOUT:30m}"
+      cookie:
+        name: "JSESSIONID"
+        same-site: "LAX"
+        max-age: "-1"
+        http-only: true
+        secure: false
+
 spring:
   application:
     name: "${DEMO_SERVICE_REST_WEB_BFF_ID:REST_WEB_BFF}"
+  profiles:
+    active: "${DEMO_SERVICE_ENVIRONMENT:dev}"
+  threads:
+    virtual:
+      enabled: true
+  data:
+    redis:
+      host: "${DEMO_DATABASE_REDIS_HOST}"
+      port: "${DEMO_DATABASE_REDIS_PORT}"
+      username: "${DEMO_DATABASE_REDIS_USERNAME}"
+      password: "${DEMO_DATABASE_REDIS_PASSWORD}"
+      repositories:
+        enabled: false
+
+logging:
+  level:
+    root: "info"
+  include-application-name: true
+  include-application-group: true
+
+management:
+  endpoints:
+    jmx:
+      exposure:
+        exclude: "*"
+    web:
+      exposure:
+        include: "*"
+    access:
+      default: "NONE"
+  endpoint:
+    health:
+      access: "READ_ONLY"
+      cache:
+        time-to-live: "5s"
+  info:
+    java:
+      enabled: true
+    env:
+      enabled: true
+
+info:
+  app:
+    service-id: "${DEMO_SERVICE_REST_WEB_BFF_ID:REST_WEB_BFF}"
+
+application:
+  authentication:
+    max-attempts: "${APP_MAX_LOGIN_ATTEMPTS:3}"
+  http:
+    client:
+      timeout-in-sec: "${APP_HTTP_CLIENT_TIMEOUT:3}"
+      pool-size: "${APP_HTTP_CLIENT_POOL_SIZE:10}"
+      max-conn-per-route: "${APP_HTTP_CLIENT_ROUTE_SIZE:5}"
+  registry:
+    services:
+      - serviceId: "${DEMO_SERVICE_FRONTEND_ID}"
+        baseUrl: "${DEMO_SERVICE_FRONTEND_BASE_URL}"
+        secretKey: "${DEMO_SERVICE_FRONTEND_SECRET_KEY}"
+      - serviceId: "${DEMO_SERVICE_REST_RESOURCE_ID}"
+        baseUrl: "${DEMO_SERVICE_REST_RESOURCE_BASE_URL}"
+        secretKey: "${DEMO_SERVICE_REST_RESOURCE_SECRET_KEY}"
+
+---
+# Environment: dev
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+
+info:
+  app:
+    environment: "dev"
+
+management:
+  endpoint:
+    info:
+      access: "READ_ONLY"
+
+---
+# Environment: staging
+spring:
+  config:
+    activate:
+      on-profile: "staging"
+
+info:
+  app:
+    environment: "staging"
+
+---
+# Environment: prod
+spring:
+  config:
+    activate:
+      on-profile: "prod"
+
+info:
+  app:
+    environment: "prod"
+
