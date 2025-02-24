@@ -73,14 +73,15 @@ application:
       timeout-in-sec: "${APP_HTTP_CLIENT_TIMEOUT:3}"
       pool-size: "${APP_HTTP_CLIENT_POOL_SIZE:10}"
       max-conn-per-route: "${APP_HTTP_CLIENT_ROUTE_SIZE:5}"
-  registry:
-    services:
-      - serviceId: "${DEMO_SERVICE_FRONTEND_ID}"
-        baseUrl: "${DEMO_SERVICE_FRONTEND_BASE_URL}"
-        secretKey: "${DEMO_SERVICE_FRONTEND_SECRET_KEY}"
-      - serviceId: "${DEMO_SERVICE_REST_RESOURCE_ID}"
-        baseUrl: "${DEMO_SERVICE_REST_RESOURCE_BASE_URL}"
-        secretKey: "${DEMO_SERVICE_REST_RESOURCE_SECRET_KEY}"
+      
+registry:
+  services:
+    - serviceId: "${DEMO_SERVICE_FRONTEND_ID}"
+      baseUrl: "${DEMO_SERVICE_FRONTEND_BASE_URL}"
+      secretKey: "${DEMO_SERVICE_FRONTEND_SECRET_KEY}"
+    - serviceId: "${DEMO_SERVICE_REST_RESOURCE_ID}"
+      baseUrl: "${DEMO_SERVICE_REST_RESOURCE_BASE_URL}"
+      secretKey: "${DEMO_SERVICE_REST_RESOURCE_SECRET_KEY}"
 
 ---
 # Environment: dev
