@@ -20,9 +20,9 @@ public class HttpClientConfig {
 
   @Bean
   ClientHttpRequestFactory clientHttpRequestFactory(
-      @Value("${info.http.client.timeout-in-sec}") int connTimeout,
-      @Value("${info.http.client.pool-size}") int connPoolSize,
-      @Value("${info.http.client.max-conn-per-route}") int maxConnPerRoute) {
+      @Value("${application.http.client.timeout-in-sec}") int connTimeout,
+      @Value("${application.http.client.pool-size}") int connPoolSize,
+      @Value("${application.http.client.max-conn-per-route}") int maxConnPerRoute) {
 
     PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
     connectionManager.setMaxTotal(connPoolSize);
