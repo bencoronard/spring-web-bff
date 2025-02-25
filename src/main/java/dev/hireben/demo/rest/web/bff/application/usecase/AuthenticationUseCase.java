@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import dev.hireben.demo.rest.web.bff.application.dto.AuthenticationDTO;
 import dev.hireben.demo.rest.web.bff.application.dto.UserSessionDTO;
+import dev.hireben.demo.rest.web.bff.application.exception.InvalidCsrfTokenException;
 import dev.hireben.demo.rest.web.bff.application.exception.UserAuthenticationException;
 import dev.hireben.demo.rest.web.bff.application.mapper.UserSessionMapper;
 import dev.hireben.demo.rest.web.bff.application.service.AuthenticationService;
@@ -63,6 +64,21 @@ public class AuthenticationUseCase {
         .build();
 
     return UserSessionMapper.toDto(sessionRepository.save(newSession));
+  }
+
+  // ---------------------------------------------------------------------------//
+
+  public void deauthenticate(String sessionId, String csrfToken) {
+
+    sessionRepository.findById(sessionId).ifPresent(session -> {
+
+      if (!session.getCsrfToken().equals(csrfToken)) {
+        throw new InvalidCsrfTokenException("Invalid CSRF token");
+      }
+
+      sessionRepository.deleteById(sessionId);
+    });
+
   }
 
 }
