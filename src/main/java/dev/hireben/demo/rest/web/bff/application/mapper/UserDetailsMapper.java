@@ -1,18 +1,18 @@
 package dev.hireben.demo.rest.web.bff.application.mapper;
 
-import dev.hireben.demo.rest.web.bff.application.dto.UserDTO;
-import dev.hireben.demo.rest.web.bff.domain.model.UserInfo;
+import dev.hireben.demo.rest.web.bff.application.dto.UserDetailsDTO;
+import dev.hireben.demo.rest.web.bff.domain.model.UserDetails;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class UserInfoMapper {
+public class UserDetailsMapper {
 
   // ---------------------------------------------------------------------------//
   // Methods
   // ---------------------------------------------------------------------------//
 
-  public UserDTO toDto(UserInfo userInfo) {
-    return UserDTO.builder()
+  public UserDetailsDTO toDto(UserDetails userInfo) {
+    return UserDetailsDTO.builder()
         .id(userInfo.getId())
         .firstName(userInfo.getFirstName())
         .lastName(userInfo.getLastName())

@@ -1,11 +1,11 @@
-package dev.hireben.demo.rest.web.bff.application.dto;
+package dev.hireben.demo.rest.web.bff.domain.model;
 
 import lombok.Builder;
 import lombok.Value;
 
 @Value
 @Builder
-public class UserDTO {
+public class UserDetails {
 
   // ---------------------------------------------------------------------------//
   // Fields

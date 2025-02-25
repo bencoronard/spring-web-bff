@@ -2,10 +2,10 @@ package dev.hireben.demo.rest.web.bff.application.service;
 
 import java.util.Optional;
 
-import dev.hireben.demo.rest.web.bff.domain.model.UserInfo;
+import dev.hireben.demo.rest.web.bff.domain.model.UserDetails;
 
 public interface AuthenticationService {
 
-  Optional<UserInfo> authenticate(String username, String password);
+  Optional<UserDetails> authenticate(String username, String password);
 
 }
