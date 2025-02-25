@@ -4,8 +4,8 @@ import java.util.Collection;
 
 public interface PermissionService {
 
-  Collection<String> retrieveViewPermissions(String roleId, String viewGroupId);
+  Collection<String> hasViewPermission(String roleId, String permissionId);
 
-  boolean hasPermission(String roleId, String permissionId);
+  boolean hasApiPermission(String roleId, String permissionId);
 
 }
