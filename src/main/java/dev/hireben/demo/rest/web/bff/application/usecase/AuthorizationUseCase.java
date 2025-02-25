@@ -24,20 +24,20 @@ public class AuthorizationUseCase {
 
   public Collection<String> authorizeView(String sessionId, String permissionId) {
 
-    UserSession existingSession = sessionRepository.findById(sessionId)
+    UserSession activeSession = sessionRepository.findById(sessionId)
         .orElseThrow(() -> new SessionNotFoundException("Session not found"));
 
-    return permissionService.hasViewPermission(existingSession.getUser().getRoleId(), permissionId);
+    return permissionService.hasViewPermission(activeSession.getUser().getRoleId(), permissionId);
   }
 
   // ---------------------------------------------------------------------------//
 
   public boolean authorizeApi(String sessionId, String permissionId) {
 
-    UserSession existingSession = sessionRepository.findById(sessionId)
+    UserSession activeSession = sessionRepository.findById(sessionId)
         .orElseThrow(() -> new SessionNotFoundException("Session not found"));
 
-    return permissionService.hasApiPermission(existingSession.getUser().getRoleId(), permissionId);
+    return permissionService.hasApiPermission(activeSession.getUser().getRoleId(), permissionId);
   }
 
 }
