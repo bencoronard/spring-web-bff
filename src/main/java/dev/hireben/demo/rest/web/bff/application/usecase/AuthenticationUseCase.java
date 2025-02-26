@@ -8,7 +8,9 @@ import java.util.Optional;
 import dev.hireben.demo.rest.web.bff.application.dto.AuthenticationDTO;
 import dev.hireben.demo.rest.web.bff.application.dto.UserSessionDTO;
 import dev.hireben.demo.rest.web.bff.application.exception.InvalidCsrfTokenException;
-import dev.hireben.demo.rest.web.bff.application.exception.UserAuthenticationException;
+import dev.hireben.demo.rest.web.bff.application.exception.SessionNotFoundException;
+import dev.hireben.demo.rest.web.bff.application.exception.DeniedAccessException;
+import dev.hireben.demo.rest.web.bff.application.exception.FailedAuthenticationException;
 import dev.hireben.demo.rest.web.bff.application.mapper.UserSessionMapper;
 import dev.hireben.demo.rest.web.bff.application.service.AuthenticationService;
 import dev.hireben.demo.rest.web.bff.application.service.CsrfTokenService;
@@ -39,10 +41,20 @@ public class AuthenticationUseCase {
   // Methods
   // ---------------------------------------------------------------------------//
 
-  public UserSessionDTO authenticate(AuthenticationDTO dto) {
+  public UserSessionDTO authenticateSession(String sessionId, AuthenticationDTO dto) {
+
+    UserSession anonymousSession = sessionRepository.findById(sessionId)
+        .orElseThrow(() -> new SessionNotFoundException(String.format("Session %s not found", sessionId)));
+
+    if (anonymousSession.getUser() != null) {
+      throw new DeniedAccessException(
+          String.format("Session %s already authenticated with user %s", sessionId,
+              anonymousSession.getUser().getId()));
+    }
 
     UserDetails user = authenticationService.authenticate(dto.getUsername(), dto.getPassword())
-        .orElseThrow(() -> new UserAuthenticationException("Invalid credentials"));
+        .orElseThrow(() -> new FailedAuthenticationException(
+            String.format("Authentication attempt failed for session %s", sessionId)));
 
     Collection<UserSession> activeSessions = sessionRepository.findAllByUserId(user.getId());
 
@@ -54,8 +66,9 @@ public class AuthenticationUseCase {
       oldestSession.ifPresent(session -> sessionRepository.deleteById(session.getId()));
     }
 
-    Instant now = Instant.now();
+    sessionRepository.deleteById(sessionId);
 
+    Instant now = Instant.now();
     UserSession newSession = UserSession.builder()
         .user(user)
         .csrfToken(csrfTokenService.generate())
@@ -68,12 +81,13 @@ public class AuthenticationUseCase {
 
   // ---------------------------------------------------------------------------//
 
-  public void deauthenticate(String sessionId, String csrfToken) {
+  public void invalidateSession(String sessionId, String csrfToken) {
 
     sessionRepository.findById(sessionId).ifPresent(session -> {
 
       if (!session.getCsrfToken().equals(csrfToken)) {
-        throw new InvalidCsrfTokenException("Invalid CSRF token");
+        throw new InvalidCsrfTokenException(
+            String.format("Failed to invalidate session %s due to invalid CSRF token", sessionId));
       }
 
       sessionRepository.deleteById(sessionId);

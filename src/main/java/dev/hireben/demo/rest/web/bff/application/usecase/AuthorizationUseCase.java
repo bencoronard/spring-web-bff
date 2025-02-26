@@ -2,6 +2,7 @@ package dev.hireben.demo.rest.web.bff.application.usecase;
 
 import java.util.Collection;
 
+import dev.hireben.demo.rest.web.bff.application.dto.UserSessionDTO;
 import dev.hireben.demo.rest.web.bff.application.exception.AccessDeniedException;
 import dev.hireben.demo.rest.web.bff.application.exception.InvalidCsrfTokenException;
 import dev.hireben.demo.rest.web.bff.application.exception.PermissionDeniedException;
@@ -25,11 +26,11 @@ public class AuthorizationUseCase {
   // Methods
   // ---------------------------------------------------------------------------//
 
-  public void authorizePublicViewAccess(String sessionId) {
+  public UserSessionDTO authorizePublicViewAccess(String sessionId) {
 
-    if (sessionId == null) {
-      return;
-    }
+    // if (sessionId == null) {
+    // return ;
+    // }
 
     sessionRepository.findById(sessionId).ifPresent(_ -> {
       throw new AccessDeniedException("User already authenticated");
