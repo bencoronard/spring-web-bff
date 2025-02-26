@@ -73,20 +73,16 @@ public class AuthorizationUseCase {
     if (activeSession.getUser() == null) {
       throw new DeniedAccessException(
           String.format("Failed to authorize protected view access (permission %s) by anonymous session %s",
-              permissionId,
-              sessionId));
+              permissionId, sessionId));
     }
 
-    Collection<String> permissionTokens = permissionService.hasViewPermission(activeSession.getUser().getRoleId(),
-        permissionId);
+    Collection<String> viewPermissionTokens = permissionService.hasViewPermission(activeSession.getUser().getRoleId(),
+        permissionId).orElseThrow(
+            () -> new DeniedPermissionException(
+                String.format("Failed to authorize protected view access (permission %s) by user %s", permissionId,
+                    activeSession.getUser().getId())));
 
-    if (permissionTokens == null) {
-      throw new DeniedPermissionException(
-          String.format("Failed to authorize protected view access (permission %s) by user %s", permissionId,
-              activeSession.getUser().getId()));
-    }
-
-    return UserSessionMapper.toDtoWithTokens(activeSession, permissionTokens);
+    return UserSessionMapper.toDtoWithTokens(activeSession, viewPermissionTokens);
   }
 
   // ---------------------------------------------------------------------------//
@@ -100,8 +96,7 @@ public class AuthorizationUseCase {
     if (activeSession.getUser() == null) {
       throw new DeniedAccessException(
           String.format("Failed to authorize API access (permission %s) by anonymous session %s",
-              permissionId,
-              sessionId));
+              permissionId, sessionId));
     }
 
     if (!permissionService.hasApiPermission(activeSession.getUser().getRoleId(), permissionId)) {
@@ -124,15 +119,13 @@ public class AuthorizationUseCase {
     if (activeSession.getUser() == null) {
       throw new DeniedAccessException(
           String.format("Failed to authorize API access (permission %s) by anonymous session %s",
-              permissionId,
-              sessionId));
+              permissionId, sessionId));
     }
 
     if (activeSession.getCsrfToken() == null || !activeSession.getCsrfToken().equals(csrfToken)) {
       throw new InvalidCsrfTokenException(String.format(
           "Failed to authorize API access (permission %s) by user %s due to missing or invalid CSRF token",
-          permissionId,
-          activeSession.getUser().getId()));
+          permissionId, activeSession.getUser().getId()));
     }
 
     if (!permissionService.hasApiPermission(activeSession.getUser().getRoleId(), permissionId)) {
