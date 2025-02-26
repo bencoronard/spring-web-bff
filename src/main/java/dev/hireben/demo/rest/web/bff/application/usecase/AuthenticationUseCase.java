@@ -44,22 +44,22 @@ public class AuthenticationUseCase {
   public UserSessionDTO authenticateSession(String sessionId, AuthenticationDTO dto) {
 
     UserSession anonymousSession = sessionRepository.findById(sessionId)
-        .orElseThrow(() -> new SessionNotFoundException(String.format("Session %s not found", sessionId)));
+        .orElseThrow(() -> new SessionNotFoundException(
+            String.format("Failed to authenticate non-existent session %s", sessionId)));
 
     if (anonymousSession.getUser() != null) {
       throw new DeniedAccessException(
-          String.format("Session %s already authenticated with user %s", sessionId,
+          String.format("Failed to authenticate already authenticated session %s owned by user %s", sessionId,
               anonymousSession.getUser().getId()));
     }
 
     UserDetails user = authenticationService.authenticate(dto.getUsername(), dto.getPassword())
         .orElseThrow(() -> new FailedAuthenticationException(
-            String.format("Authentication attempt failed for session %s", sessionId)));
+            String.format("Failed to authenticate anonymous session %s", sessionId)));
 
     Collection<UserSession> activeSessions = sessionRepository.findAllByUserId(user.getId());
 
     if (activeSessions.size() >= MAX_ACTIVE_USER_SESSIONS) {
-
       Optional<UserSession> oldestSession = activeSessions.stream()
           .min(Comparator.comparing(UserSession::getCreatedAt));
 

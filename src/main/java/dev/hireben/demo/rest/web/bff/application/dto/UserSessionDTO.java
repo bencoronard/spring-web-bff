@@ -1,6 +1,7 @@
 package dev.hireben.demo.rest.web.bff.application.dto;
 
 import java.time.Instant;
+import java.util.Collection;
 
 import lombok.Builder;
 import lombok.Value;
@@ -16,5 +17,6 @@ public class UserSessionDTO {
   String sessionId;
   String csrfToken;
   Instant expiresAt;
+  Collection<String> permissionTokens;
 
 }
