@@ -4,8 +4,9 @@ import java.util.Collection;
 
 import dev.hireben.demo.rest.web.bff.application.dto.UserSessionDTO;
 import dev.hireben.demo.rest.web.bff.application.exception.AccessDeniedException;
+import dev.hireben.demo.rest.web.bff.application.exception.DeniedAccessException;
 import dev.hireben.demo.rest.web.bff.application.exception.InvalidCsrfTokenException;
-import dev.hireben.demo.rest.web.bff.application.exception.PermissionDeniedException;
+import dev.hireben.demo.rest.web.bff.application.exception.DeniedPermissionException;
 import dev.hireben.demo.rest.web.bff.application.exception.SessionNotFoundException;
 import dev.hireben.demo.rest.web.bff.application.service.PermissionService;
 import dev.hireben.demo.rest.web.bff.domain.entity.UserSession;
@@ -33,7 +34,7 @@ public class AuthorizationUseCase {
     // }
 
     sessionRepository.findById(sessionId).ifPresent(_ -> {
-      throw new AccessDeniedException("User already authenticated");
+      throw new DeniedAccessException("User already authenticated");
     });
   }
 
@@ -48,7 +49,7 @@ public class AuthorizationUseCase {
         permissionId);
 
     if (subViewPermissions == null) {
-      throw new PermissionDeniedException("User not authorized");
+      throw new DeniedPermissionException("User not authorized");
     }
 
     return subViewPermissions;
@@ -62,7 +63,7 @@ public class AuthorizationUseCase {
         .orElseThrow(() -> new SessionNotFoundException("Session not found"));
 
     if (!permissionService.hasApiPermission(activeSession.getUser().getRoleId(), permissionId)) {
-      throw new PermissionDeniedException("User not authorized");
+      throw new DeniedPermissionException("User not authorized");
     }
   }
 
@@ -78,7 +79,7 @@ public class AuthorizationUseCase {
     }
 
     if (!permissionService.hasApiPermission(activeSession.getUser().getRoleId(), permissionId)) {
-      throw new PermissionDeniedException("User not authorized");
+      throw new DeniedPermissionException("User not authorized");
     }
   }
 
