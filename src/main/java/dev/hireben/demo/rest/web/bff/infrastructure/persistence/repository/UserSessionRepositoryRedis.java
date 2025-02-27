@@ -6,14 +6,14 @@ import java.util.Optional;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.stereotype.Repository;
 
-import dev.hireben.demo.rest.web.bff.domain.entity.UserSession;
-import dev.hireben.demo.rest.web.bff.domain.repository.UserSessionRepository;
+import dev.hireben.demo.rest.web.bff.domain.entity.Sezzion;
+import dev.hireben.demo.rest.web.bff.domain.repository.SezzionRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserSessionRepositoryRedis implements UserSessionRepository {
+public class UserSessionRepositoryRedis implements SezzionRepository {
 
   // ---------------------------------------------------------------------------//
   // Dependencies
@@ -27,7 +27,7 @@ public class UserSessionRepositoryRedis implements UserSessionRepository {
   // ---------------------------------------------------------------------------//
 
   @Override
-  public UserSession save(UserSession session) {
+  public Sezzion save(Sezzion session) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'save'");
   }
@@ -43,7 +43,7 @@ public class UserSessionRepositoryRedis implements UserSessionRepository {
   // ---------------------------------------------------------------------------//
 
   @Override
-  public Optional<UserSession> findById(String id) {
+  public Optional<Sezzion> findById(String id) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'findById'");
   }
@@ -51,7 +51,7 @@ public class UserSessionRepositoryRedis implements UserSessionRepository {
   // ---------------------------------------------------------------------------//
 
   @Override
-  public Collection<UserSession> findAllByUserId(String userId) {
+  public Collection<Sezzion> findAllByUserId(String userId) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'findAllByUserId'");
   }

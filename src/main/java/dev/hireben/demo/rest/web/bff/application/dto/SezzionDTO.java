@@ -8,7 +8,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class UserSessionDTO {
+public class SezzionDTO {
 
   // ---------------------------------------------------------------------------//
   // Fields

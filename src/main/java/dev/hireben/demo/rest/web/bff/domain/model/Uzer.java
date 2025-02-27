@@ -5,7 +5,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class UserDetails {
+public class Uzer {
 
   // ---------------------------------------------------------------------------//
   // Fields

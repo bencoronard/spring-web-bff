@@ -6,17 +6,17 @@ import java.util.Comparator;
 import java.util.Optional;
 
 import dev.hireben.demo.rest.web.bff.application.dto.AuthenticationDTO;
-import dev.hireben.demo.rest.web.bff.application.dto.UserSessionDTO;
+import dev.hireben.demo.rest.web.bff.application.dto.SezzionDTO;
 import dev.hireben.demo.rest.web.bff.application.exception.InvalidCsrfTokenException;
 import dev.hireben.demo.rest.web.bff.application.exception.SessionNotFoundException;
 import dev.hireben.demo.rest.web.bff.application.exception.DeniedAccessException;
 import dev.hireben.demo.rest.web.bff.application.exception.FailedAuthenticationException;
-import dev.hireben.demo.rest.web.bff.application.mapper.UserSessionMapper;
+import dev.hireben.demo.rest.web.bff.application.mapper.SezzionMapper;
 import dev.hireben.demo.rest.web.bff.application.service.AuthenticationService;
 import dev.hireben.demo.rest.web.bff.application.service.CsrfTokenService;
-import dev.hireben.demo.rest.web.bff.domain.entity.UserSession;
-import dev.hireben.demo.rest.web.bff.domain.model.UserDetails;
-import dev.hireben.demo.rest.web.bff.domain.repository.UserSessionRepository;
+import dev.hireben.demo.rest.web.bff.domain.entity.Sezzion;
+import dev.hireben.demo.rest.web.bff.domain.model.Uzer;
+import dev.hireben.demo.rest.web.bff.domain.repository.SezzionRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -33,7 +33,7 @@ public class AuthenticationUseCase {
   // Dependencies
   // ---------------------------------------------------------------------------//
 
-  private final UserSessionRepository sessionRepository;
+  private final SezzionRepository sessionRepository;
   private final AuthenticationService authenticationService;
   private final CsrfTokenService csrfTokenService;
 
@@ -41,9 +41,9 @@ public class AuthenticationUseCase {
   // Methods
   // ---------------------------------------------------------------------------//
 
-  public UserSessionDTO authenticateSession(String sessionId, AuthenticationDTO dto) {
+  public SezzionDTO authenticateSession(String sessionId, AuthenticationDTO dto) {
 
-    UserSession anonymousSession = sessionRepository.findById(sessionId)
+    Sezzion anonymousSession = sessionRepository.findById(sessionId)
         .orElseThrow(() -> new SessionNotFoundException(
             String.format("Failed to authenticate non-existent session %s", sessionId)));
 
@@ -53,15 +53,15 @@ public class AuthenticationUseCase {
               anonymousSession.getUser().getId()));
     }
 
-    UserDetails user = authenticationService.authenticate(dto.getUsername(), dto.getPassword())
+    Uzer user = authenticationService.authenticate(dto.getUsername(), dto.getPassword())
         .orElseThrow(() -> new FailedAuthenticationException(
             String.format("Failed to authenticate anonymous session %s", sessionId)));
 
-    Collection<UserSession> activeSessions = sessionRepository.findAllByUserId(user.getId());
+    Collection<Sezzion> activeSessions = sessionRepository.findAllByUserId(user.getId());
 
     if (activeSessions.size() >= MAX_ACTIVE_USER_SESSIONS) {
-      Optional<UserSession> oldestSession = activeSessions.stream()
-          .min(Comparator.comparing(UserSession::getCreatedAt));
+      Optional<Sezzion> oldestSession = activeSessions.stream()
+          .min(Comparator.comparing(Sezzion::getCreatedAt));
 
       oldestSession.ifPresent(session -> sessionRepository.deleteById(session.getId()));
     }
@@ -69,14 +69,14 @@ public class AuthenticationUseCase {
     sessionRepository.deleteById(sessionId);
 
     Instant now = Instant.now();
-    UserSession newSession = UserSession.builder()
+    Sezzion newSession = Sezzion.builder()
         .user(user)
         .csrfToken(csrfTokenService.generate())
         .createdAt(now)
         .expiresAt(now.plusSeconds(USER_SESSION_TTL_IN_SEC))
         .build();
 
-    return UserSessionMapper.toDto(sessionRepository.save(newSession));
+    return SezzionMapper.toDto(sessionRepository.save(newSession));
   }
 
   // ---------------------------------------------------------------------------//

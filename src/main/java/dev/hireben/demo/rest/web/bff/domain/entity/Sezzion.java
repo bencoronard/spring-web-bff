@@ -2,20 +2,20 @@ package dev.hireben.demo.rest.web.bff.domain.entity;
 
 import java.time.Instant;
 
-import dev.hireben.demo.rest.web.bff.domain.model.UserDetails;
+import dev.hireben.demo.rest.web.bff.domain.model.Uzer;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class UserSession {
+public class Sezzion {
 
   // ---------------------------------------------------------------------------//
   // Fields
   // ---------------------------------------------------------------------------//
 
   private final String id;
-  private final UserDetails user;
+  private final Uzer user;
   private final String csrfToken;
   private final Instant createdAt;
   private Instant expiresAt;

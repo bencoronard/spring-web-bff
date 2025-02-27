@@ -4,16 +4,16 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Optional;
 
-import dev.hireben.demo.rest.web.bff.application.dto.UserSessionDTO;
+import dev.hireben.demo.rest.web.bff.application.dto.SezzionDTO;
 import dev.hireben.demo.rest.web.bff.application.exception.RedirectToProtectedException;
 import dev.hireben.demo.rest.web.bff.application.exception.SessionNotFoundException;
 import dev.hireben.demo.rest.web.bff.application.exception.DeniedAccessException;
 import dev.hireben.demo.rest.web.bff.application.exception.DeniedPermissionException;
 import dev.hireben.demo.rest.web.bff.application.exception.InvalidCsrfTokenException;
-import dev.hireben.demo.rest.web.bff.application.mapper.UserSessionMapper;
+import dev.hireben.demo.rest.web.bff.application.mapper.SezzionMapper;
 import dev.hireben.demo.rest.web.bff.application.service.PermissionService;
-import dev.hireben.demo.rest.web.bff.domain.entity.UserSession;
-import dev.hireben.demo.rest.web.bff.domain.repository.UserSessionRepository;
+import dev.hireben.demo.rest.web.bff.domain.entity.Sezzion;
+import dev.hireben.demo.rest.web.bff.domain.repository.SezzionRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -29,44 +29,44 @@ public class AuthorizationUseCase {
   // Dependencies
   // ---------------------------------------------------------------------------//
 
-  private final UserSessionRepository sessionRepository;
+  private final SezzionRepository sessionRepository;
   private final PermissionService permissionService;
 
   // ---------------------------------------------------------------------------//
   // Methods
   // ---------------------------------------------------------------------------//
 
-  public UserSessionDTO authorizePublicViewAccess(String sessionId) {
+  public SezzionDTO authorizePublicViewAccess(String sessionId) {
 
     if (sessionId != null) {
-      Optional<UserSession> existingSession = sessionRepository.findById(sessionId);
+      Optional<Sezzion> existingSession = sessionRepository.findById(sessionId);
 
       if (existingSession.isPresent()) {
-        UserSession anonymousSession = existingSession.get();
+        Sezzion anonymousSession = existingSession.get();
 
         if (anonymousSession.getUser() != null) {
           throw new RedirectToProtectedException(
               String.format("Failed to authorize public view access by authenticated session %s", sessionId));
         }
 
-        return UserSessionMapper.toDto(anonymousSession);
+        return SezzionMapper.toDto(anonymousSession);
       }
     }
 
     Instant now = Instant.now();
-    UserSession newAnonymousSession = UserSession.builder()
+    Sezzion newAnonymousSession = Sezzion.builder()
         .createdAt(now)
         .expiresAt(now.plusSeconds(ANONYMOUS_SESSION_TTL_IN_SEC))
         .build();
 
-    return UserSessionMapper.toDto(sessionRepository.save(newAnonymousSession));
+    return SezzionMapper.toDto(sessionRepository.save(newAnonymousSession));
   }
 
   // ---------------------------------------------------------------------------//
 
-  public UserSessionDTO authorizeViewAccess(String sessionId, String permissionId) {
+  public SezzionDTO authorizeViewAccess(String sessionId, String permissionId) {
 
-    UserSession activeSession = sessionRepository.findById(sessionId)
+    Sezzion activeSession = sessionRepository.findById(sessionId)
         .orElseThrow(() -> new SessionNotFoundException(
             String.format("Failed to authorize protected view access by non-existent session %s", sessionId)));
 
@@ -82,14 +82,14 @@ public class AuthorizationUseCase {
                 String.format("Failed to authorize protected view access (permission %s) by user %s", permissionId,
                     activeSession.getUser().getId())));
 
-    return UserSessionMapper.toDtoWithTokens(activeSession, viewPermissionTokens);
+    return SezzionMapper.toDtoWithTokens(activeSession, viewPermissionTokens);
   }
 
   // ---------------------------------------------------------------------------//
 
-  public UserSessionDTO authorizeApiAccess(String sessionId, String permissionId) {
+  public SezzionDTO authorizeApiAccess(String sessionId, String permissionId) {
 
-    UserSession activeSession = sessionRepository.findById(sessionId)
+    Sezzion activeSession = sessionRepository.findById(sessionId)
         .orElseThrow(() -> new SessionNotFoundException(
             String.format("Failed to authorize API access by non-existent session %s", sessionId)));
 
@@ -105,14 +105,14 @@ public class AuthorizationUseCase {
               activeSession.getUser().getId()));
     }
 
-    return UserSessionMapper.toDto(activeSession);
+    return SezzionMapper.toDto(activeSession);
   }
 
   // ---------------------------------------------------------------------------//
 
-  public UserSessionDTO authorizeStateChangingApiAccess(String sessionId, String permissionId, String csrfToken) {
+  public SezzionDTO authorizeStateChangingApiAccess(String sessionId, String permissionId, String csrfToken) {
 
-    UserSession activeSession = sessionRepository.findById(sessionId)
+    Sezzion activeSession = sessionRepository.findById(sessionId)
         .orElseThrow(() -> new SessionNotFoundException(
             String.format("Failed to authorize API access by non-existent session %s", sessionId)));
 
@@ -134,7 +134,7 @@ public class AuthorizationUseCase {
               activeSession.getUser().getId()));
     }
 
-    return UserSessionMapper.toDto(activeSession);
+    return SezzionMapper.toDto(activeSession);
   }
 
 }
