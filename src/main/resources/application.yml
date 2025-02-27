@@ -33,6 +33,10 @@ spring:
       password: "${DEMO_DATABASE_REDIS_PASSWORD}"
       repositories:
         enabled: false
+  session:
+    redis:
+      repository-type: indexed
+      namespace: spring:session:bff
 
 logging:
   level:
