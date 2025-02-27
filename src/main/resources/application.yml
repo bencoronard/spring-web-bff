@@ -31,6 +31,8 @@ spring:
       port: "${DEMO_DATABASE_REDIS_PORT}"
       username: "${DEMO_DATABASE_REDIS_USERNAME}"
       password: "${DEMO_DATABASE_REDIS_PASSWORD}"
+      repositories:
+        enabled: false
 
 logging:
   level:
@@ -64,13 +66,15 @@ info:
     service-id: "${DEMO_SERVICE_REST_WEB_BFF_ID:REST_WEB_BFF}"
 
 application:
-  authentication:
-    max-attempts: "${APP_MAX_LOGIN_ATTEMPTS:3}"
+  redis:
+    connection-mode: "${DEMO_DATABASE_REDIS_CONN_MODE:STANDALONE}"
   http:
     client:
       timeout-in-sec: "${APP_HTTP_CLIENT_TIMEOUT:3}"
       pool-size: "${APP_HTTP_CLIENT_POOL_SIZE:10}"
       max-conn-per-route: "${APP_HTTP_CLIENT_ROUTE_SIZE:5}"
+  authentication:
+    max-attempts: "${APP_MAX_LOGIN_ATTEMPTS:3}"
       
 registry:
   services:
