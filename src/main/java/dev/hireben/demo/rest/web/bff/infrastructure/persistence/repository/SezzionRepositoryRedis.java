@@ -3,7 +3,6 @@ package dev.hireben.demo.rest.web.bff.infrastructure.persistence.repository;
 import java.util.Collection;
 import java.util.Optional;
 
-import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.stereotype.Repository;
 
 import dev.hireben.demo.rest.web.bff.domain.entity.Sezzion;
@@ -13,14 +12,11 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserSessionRepositoryRedis implements SezzionRepository {
+public class SezzionRepositoryRedis implements SezzionRepository {
 
   // ---------------------------------------------------------------------------//
   // Dependencies
   // ---------------------------------------------------------------------------//
-
-  @SuppressWarnings("unused")
-  private final FindByIndexNameSessionRepository<?> sessionRepository;
 
   // ---------------------------------------------------------------------------//
   // Methods
@@ -28,32 +24,28 @@ public class UserSessionRepositoryRedis implements SezzionRepository {
 
   @Override
   public Sezzion save(Sezzion session) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'save'");
+    return session;
   }
 
   // ---------------------------------------------------------------------------//
 
   @Override
   public void deleteById(String id) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
+
   }
 
   // ---------------------------------------------------------------------------//
 
   @Override
   public Optional<Sezzion> findById(String id) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'findById'");
+    return null;
   }
 
   // ---------------------------------------------------------------------------//
 
   @Override
   public Collection<Sezzion> findAllByUserId(String userId) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'findAllByUserId'");
+    return null;
   }
 
 }
