@@ -71,7 +71,7 @@ public class AuthenticationUseCase {
     Instant now = Instant.now();
     Sezzion newSession = Sezzion.builder()
         .user(user)
-        .csrfToken(csrfTokenService.generate())
+        .syncToken(csrfTokenService.generate())
         .createdAt(now)
         .expiresAt(now.plusSeconds(USER_SESSION_TTL_IN_SEC))
         .build();
@@ -81,11 +81,11 @@ public class AuthenticationUseCase {
 
   // ---------------------------------------------------------------------------//
 
-  public void invalidateSession(String sessionId, String csrfToken) {
+  public void invalidateSession(String sessionId, String syncToken) {
 
     sessionRepository.findById(sessionId).ifPresent(session -> {
 
-      if (!session.getCsrfToken().equals(csrfToken)) {
+      if (!session.getSyncToken().equals(syncToken)) {
         throw new InvalidCsrfTokenException(
             String.format("Failed to invalidate session %s due to invalid CSRF token", sessionId));
       }

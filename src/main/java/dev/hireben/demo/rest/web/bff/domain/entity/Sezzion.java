@@ -16,7 +16,7 @@ public class Sezzion {
 
   private final String id;
   private final Uzer user;
-  private final String csrfToken;
+  private final String syncToken;
   private final Instant createdAt;
   private Instant expiresAt;
 

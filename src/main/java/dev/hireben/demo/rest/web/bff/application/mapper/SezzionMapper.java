@@ -16,7 +16,7 @@ public class SezzionMapper {
   public SezzionDTO toDto(Sezzion session) {
     return SezzionDTO.builder()
         .sessionId(session.getId())
-        .csrfToken(session.getCsrfToken())
+        .csrfToken(session.getSyncToken())
         .expiresAt(session.getExpiresAt())
         .build();
   }
@@ -27,7 +27,7 @@ public class SezzionMapper {
     return SezzionDTO.builder()
         .sessionId(session.getId())
         .permissionTokens(permissionTokens)
-        .csrfToken(session.getCsrfToken())
+        .csrfToken(session.getSyncToken())
         .expiresAt(session.getExpiresAt())
         .build();
   }

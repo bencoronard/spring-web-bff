@@ -110,7 +110,7 @@ public class AuthorizationUseCase {
 
   // ---------------------------------------------------------------------------//
 
-  public SezzionDTO authorizeStateChangingApiAccess(String sessionId, String permissionId, String csrfToken) {
+  public SezzionDTO authorizeStateChangingApiAccess(String sessionId, String permissionId, String syncToken) {
 
     Sezzion activeSession = sessionRepository.findById(sessionId)
         .orElseThrow(() -> new SessionNotFoundException(
@@ -122,9 +122,9 @@ public class AuthorizationUseCase {
               permissionId, sessionId));
     }
 
-    if (activeSession.getCsrfToken() == null || !activeSession.getCsrfToken().equals(csrfToken)) {
+    if (activeSession.getSyncToken() == null || !activeSession.getSyncToken().equals(syncToken)) {
       throw new InvalidCsrfTokenException(String.format(
-          "Failed to authorize API access (permission %s) by user %s due to missing or invalid CSRF token",
+          "Failed to authorize API access (permission %s) by user %s due to missing or invalid synchronizer token",
           permissionId, activeSession.getUser().getId()));
     }
 
