@@ -13,7 +13,7 @@ import dev.hireben.demo.rest.web.bff.application.exception.DeniedAccessException
 import dev.hireben.demo.rest.web.bff.application.exception.FailedAuthenticationException;
 import dev.hireben.demo.rest.web.bff.application.mapper.SezzionMapper;
 import dev.hireben.demo.rest.web.bff.application.service.AuthenticationService;
-import dev.hireben.demo.rest.web.bff.application.service.CsrfTokenService;
+import dev.hireben.demo.rest.web.bff.application.service.SyncTokenService;
 import dev.hireben.demo.rest.web.bff.domain.entity.Sezzion;
 import dev.hireben.demo.rest.web.bff.domain.model.Uzer;
 import dev.hireben.demo.rest.web.bff.domain.repository.SezzionRepository;
@@ -35,7 +35,7 @@ public class AuthenticationUseCase {
 
   private final SezzionRepository sessionRepository;
   private final AuthenticationService authenticationService;
-  private final CsrfTokenService csrfTokenService;
+  private final SyncTokenService syncTokenService;
 
   // ---------------------------------------------------------------------------//
   // Methods
@@ -71,7 +71,7 @@ public class AuthenticationUseCase {
     Instant now = Instant.now();
     Sezzion newSession = Sezzion.builder()
         .user(user)
-        .syncToken(csrfTokenService.generate())
+        .syncToken(syncTokenService.generate())
         .createdAt(now)
         .expiresAt(now.plusSeconds(USER_SESSION_TTL_IN_SEC))
         .build();
