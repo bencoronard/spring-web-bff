@@ -27,12 +27,23 @@ spring:
       enabled: true
   data:
     redis:
+      repositories:
+        enabled: false
       host: "${DEMO_DATABASE_REDIS_HOST}"
       port: "${DEMO_DATABASE_REDIS_PORT}"
       username: "${DEMO_DATABASE_REDIS_USERNAME}"
       password: "${DEMO_DATABASE_REDIS_PASSWORD}"
-      repositories:
-        enabled: false
+      timeout: "2000ms"
+      cluster:
+        nodes:
+        - "127.0.0.1:6379"
+        - "127.0.0.2:6379"
+      sentinel:
+        master: "mymaster"
+        nodes:
+        - "127.0.0.1:26379"
+        - "127.0.0.2:26379"
+      
 
 logging:
   level:
