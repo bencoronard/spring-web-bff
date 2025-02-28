@@ -1,6 +1,6 @@
 package dev.hireben.demo.rest.web.bff.application.service;
 
-public interface CsrfTokenService {
+public interface SyncTokenService {
 
   String generate();
 
