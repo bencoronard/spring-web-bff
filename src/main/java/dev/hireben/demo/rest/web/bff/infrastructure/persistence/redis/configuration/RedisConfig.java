@@ -17,12 +17,26 @@ public class RedisConfig {
   // ---------------------------------------------------------------------------//
 
   @Bean
-  RedisTemplate<String, SezzionEntity> sezzionRedisTemplate(RedisConnectionFactory connectionFactory) {
+  RedisTemplate<String, SezzionEntity> sessionRedisTemplate(RedisConnectionFactory connectionFactory) {
     RedisTemplate<String, SezzionEntity> template = new RedisTemplate<>();
     template.setConnectionFactory(connectionFactory);
 
     template.setKeySerializer(new StringRedisSerializer());
     template.setValueSerializer(new Jackson2JsonRedisSerializer<>(SezzionEntity.class));
+
+    template.afterPropertiesSet();
+    return template;
+  }
+
+  // ---------------------------------------------------------------------------//
+
+  @Bean
+  RedisTemplate<String, String> userSessionsRedisTemplate(RedisConnectionFactory connectionFactory) {
+    RedisTemplate<String, String> template = new RedisTemplate<>();
+    template.setConnectionFactory(connectionFactory);
+
+    template.setKeySerializer(new StringRedisSerializer());
+    template.setValueSerializer(new StringRedisSerializer());
 
     template.afterPropertiesSet();
     return template;
