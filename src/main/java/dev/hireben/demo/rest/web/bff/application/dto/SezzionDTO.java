@@ -15,7 +15,7 @@ public class SezzionDTO {
   // ---------------------------------------------------------------------------//
 
   String sessionId;
-  String csrfToken;
+  String syncToken;
   Instant expiresAt;
   Collection<String> permissionTokens;
 
