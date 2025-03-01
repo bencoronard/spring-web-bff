@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import dev.hireben.demo.rest.web.bff.application.exception.FailedAuthenticationException;
+import dev.hireben.demo.rest.web.bff.application.exception.AuthenticationFailedException;
 import dev.hireben.demo.rest.web.bff.application.model.ApplicationException;
 import dev.hireben.demo.rest.web.bff.presentation.exception.dto.FieldValidationErrorMap;
 import dev.hireben.demo.rest.web.bff.presentation.exception.model.SeverityLevel;
@@ -32,10 +32,10 @@ public class GlobalExceptionHandler {
   // ---------------------------------------------------------------------------//
 
   private static final Map<Class<? extends Throwable>, HttpStatus> EXCEPTION_STATUS_MAP = Map.of(
-      FailedAuthenticationException.class, HttpStatus.UNAUTHORIZED);
+      AuthenticationFailedException.class, HttpStatus.UNAUTHORIZED);
 
   private static final Map<Class<? extends Throwable>, String> EXCEPTION_CODE_MAP = Map.of(
-      FailedAuthenticationException.class, "4001");
+      AuthenticationFailedException.class, "4001");
 
   // ---------------------------------------------------------------------------//
   // Methods
