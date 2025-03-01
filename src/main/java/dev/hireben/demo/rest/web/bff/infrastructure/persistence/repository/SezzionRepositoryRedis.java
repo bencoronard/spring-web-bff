@@ -26,9 +26,9 @@ public class SezzionRepositoryRedis implements SezzionRepository {
   // Fields
   // ---------------------------------------------------------------------------//
 
-  private static final String PREFIX_SESSION_ID_KEY = "sezzion";
-  private static final String PREFIX_USER_ID_KEY = "uzer";
-  private static final String KEY_FORMAT = "%s:%s";
+  private final String KEY_FORMAT = "%s:%s";
+  private final String PREFIX_SESSION_ID_KEY = "sezzion";
+  private final String PREFIX_USER_ID_KEY = "uzer";
 
   // ---------------------------------------------------------------------------//
   // Dependencies
