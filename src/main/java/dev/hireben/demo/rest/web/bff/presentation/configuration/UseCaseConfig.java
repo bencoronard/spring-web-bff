@@ -25,7 +25,8 @@ public class UseCaseConfig {
       AuthenticationService authenService,
       @Value("${application.auth.session.max-per-user}") int maxActiveUserSessions,
       @Value("${application.auth.session.user-ttl}") int userSessionTtl) {
-    return new AuthenticationUseCase(maxActiveUserSessions, 0, sessionRepository, authenService, syncTokenService);
+    return new AuthenticationUseCase(maxActiveUserSessions, userSessionTtl, sessionRepository, authenService,
+        syncTokenService);
   }
 
   // ---------------------------------------------------------------------------//
