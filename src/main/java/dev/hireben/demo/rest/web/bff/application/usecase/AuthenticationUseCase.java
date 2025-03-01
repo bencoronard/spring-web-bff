@@ -7,10 +7,11 @@ import java.util.Optional;
 
 import dev.hireben.demo.rest.web.bff.application.dto.AuthenticationDTO;
 import dev.hireben.demo.rest.web.bff.application.dto.SezzionDTO;
-import dev.hireben.demo.rest.web.bff.application.exception.InvalidCsrfTokenException;
+import dev.hireben.demo.rest.web.bff.application.exception.InvalidSyncTokenException;
+import dev.hireben.demo.rest.web.bff.application.exception.SessionExpiredException;
 import dev.hireben.demo.rest.web.bff.application.exception.SessionNotFoundException;
-import dev.hireben.demo.rest.web.bff.application.exception.DeniedAccessException;
-import dev.hireben.demo.rest.web.bff.application.exception.FailedAuthenticationException;
+import dev.hireben.demo.rest.web.bff.application.exception.DuplicateAuthenticationException;
+import dev.hireben.demo.rest.web.bff.application.exception.AuthenticationFailedException;
 import dev.hireben.demo.rest.web.bff.application.mapper.SezzionMapper;
 import dev.hireben.demo.rest.web.bff.application.service.AuthenticationService;
 import dev.hireben.demo.rest.web.bff.application.service.SyncTokenService;
@@ -43,18 +44,22 @@ public class AuthenticationUseCase {
 
   public SezzionDTO authenticateSession(String sessionId, AuthenticationDTO dto) {
 
-    Sezzion anonymousSession = sessionRepository.findById(sessionId)
+    Sezzion existingSession = sessionRepository.findById(sessionId)
         .orElseThrow(() -> new SessionNotFoundException(
             String.format("Failed to authenticate non-existent session %s", sessionId)));
 
-    if (anonymousSession.getUser() != null) {
-      throw new DeniedAccessException(
+    if (existingSession.getExpiresAt().isBefore(Instant.now())) {
+      throw new SessionExpiredException(String.format("Failed to authenticate expired session %s", sessionId));
+    }
+
+    if (existingSession.getUser() != null) {
+      throw new DuplicateAuthenticationException(
           String.format("Failed to authenticate already authenticated session %s owned by user %s", sessionId,
-              anonymousSession.getUser().getId()));
+              existingSession.getUser().getId()));
     }
 
     Uzer user = authenticationService.authenticate(dto.getUsername(), dto.getPassword())
-        .orElseThrow(() -> new FailedAuthenticationException(
+        .orElseThrow(() -> new AuthenticationFailedException(
             String.format("Failed to authenticate anonymous session %s", sessionId)));
 
     Collection<Sezzion> activeSessions = sessionRepository.findAllByUserId(user.getId());
@@ -62,7 +67,6 @@ public class AuthenticationUseCase {
     if (activeSessions.size() >= MAX_ACTIVE_USER_SESSIONS) {
       Optional<Sezzion> oldestSession = activeSessions.stream()
           .min(Comparator.comparing(Sezzion::getCreatedAt));
-
       oldestSession.ifPresent(session -> sessionRepository.deleteById(session.getId()));
     }
 
@@ -82,17 +86,15 @@ public class AuthenticationUseCase {
   // ---------------------------------------------------------------------------//
 
   public void invalidateSession(String sessionId, String syncToken) {
-
     sessionRepository.findById(sessionId).ifPresent(session -> {
 
       if (!session.getSyncToken().equals(syncToken)) {
-        throw new InvalidCsrfTokenException(
+        throw new InvalidSyncTokenException(
             String.format("Failed to invalidate session %s due to invalid CSRF token", sessionId));
       }
 
       sessionRepository.deleteById(sessionId);
     });
-
   }
 
 }
