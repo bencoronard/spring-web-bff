@@ -77,15 +77,17 @@ info:
     service-id: "${DEMO_SERVICE_REST_WEB_BFF_ID:REST_WEB_BFF}"
 
 application:
-  redis:
-    connection-mode: "${DEMO_DATABASE_REDIS_CONN_MODE:STANDALONE}"
   http:
     client:
       timeout-in-sec: "${APP_HTTP_CLIENT_TIMEOUT:3}"
       pool-size: "${APP_HTTP_CLIENT_POOL_SIZE:10}"
       max-conn-per-route: "${APP_HTTP_CLIENT_ROUTE_SIZE:5}"
-  authentication:
-    max-attempts: "${APP_MAX_LOGIN_ATTEMPTS:3}"
+  auth:
+    session:
+      anonymous-ttl: "${APP_SESSION_TTL: 1800}"
+      user-ttl: "${APP_USER_SESSION_TTL: 3600}"
+      max-per-user: "${APP_MAX_USER_SESSIONS:2}"
+    login-limit: "${APP_LOGIN_ATTEMPTS_LIMIT:3}"
       
 registry:
   services:
