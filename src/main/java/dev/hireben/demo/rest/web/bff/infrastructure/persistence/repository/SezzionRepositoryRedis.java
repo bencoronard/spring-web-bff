@@ -7,8 +7,13 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
+import java.util.function.BiFunction;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 import dev.hireben.demo.rest.web.bff.domain.entity.Sezzion;
@@ -45,32 +50,40 @@ public class SezzionRepositoryRedis implements SezzionRepository {
   public Sezzion save(Sezzion session) {
 
     if (session.getId() != null) {
-      sessionRedisTemplate.expireAt(formatSessionKeyFrom(session.getId()), session.getExpiresAt());
+      executeInTransaction((sessionOperations, userSessionsOperations) -> {
+        sessionOperations.expireAt(formatSessionKeyFrom(session.getId()), session.getExpiresAt());
+
+        if (session.getUser() != null) {
+          userSessionsOperations.expireAt(formatUserIdKeyFrom(session.getUser().getId()), session.getExpiresAt());
+        }
+
+        return null;
+      });
+
       return session;
     }
 
     String newSessionId = UUID.randomUUID().toString();
-
     SezzionEntity newSession = SezzionEntity.builder()
         .id(newSessionId)
         .user(session.getUser())
         .syncToken(session.getSyncToken())
         .createdAt(session.getCreatedAt())
         .build();
-
     String newSessionKey = formatSessionKeyFrom(newSessionId);
 
-    sessionRedisTemplate.opsForValue().set(newSessionKey, newSession,
-        Duration.between(Instant.now(), session.getExpiresAt()));
+    executeInTransaction((sessionOperations, userSessionsOperations) -> {
+      sessionOperations.opsForValue().set(newSessionKey, newSession,
+          Duration.between(Instant.now(), session.getExpiresAt()));
 
-    if (session.getUser() == null) {
-      return SezzionEntityMapper.toDomain(newSession, session.getExpiresAt());
-    }
+      if (session.getUser() != null) {
+        String currentUserIdKey = formatUserIdKeyFrom(session.getUser().getId());
+        userSessionsOperations.opsForSet().add(currentUserIdKey, newSessionId);
+        userSessionsOperations.expireAt(currentUserIdKey, session.getExpiresAt());
+      }
 
-    String currentUserIdKey = formatUserIdKeyFrom(session.getUser().getId());
-
-    userSessionsRedisTemplate.opsForSet().add(currentUserIdKey, newSessionId);
-    userSessionsRedisTemplate.expireAt(currentUserIdKey, session.getExpiresAt());
+      return null;
+    });
 
     return SezzionEntityMapper.toDomain(newSession, session.getExpiresAt());
   }
@@ -88,11 +101,15 @@ public class SezzionRepositoryRedis implements SezzionRepository {
       return;
     }
 
-    if (session.getUser() != null) {
-      sessionRedisTemplate.opsForSet().remove(formatUserIdKeyFrom(session.getUser().getId()), id);
-    }
+    executeInTransaction((sessionOperations, userSessionsOperations) -> {
+      if (session.getUser() != null) {
+        userSessionsOperations.opsForSet().remove(formatUserIdKeyFrom(session.getUser().getId()), id);
+      }
 
-    sessionRedisTemplate.delete(sessionKey);
+      sessionOperations.delete(sessionKey);
+
+      return null;
+    });
   }
 
   // ---------------------------------------------------------------------------//
@@ -147,6 +164,24 @@ public class SezzionRepositoryRedis implements SezzionRepository {
 
   private String formatUserIdKeyFrom(String userId) {
     return String.format(KEY_FORMAT, PREFIX_USER_ID_KEY, userId);
+  }
+
+  // ---------------------------------------------------------------------------//
+
+  private <T> T executeInTransaction(
+      BiFunction<RedisTemplate<String, SezzionEntity>, RedisTemplate<String, String>, T> callback) {
+    return sessionRedisTemplate.execute(new SessionCallback<T>() {
+
+      @Override
+      @Nullable
+      public <K, V> T execute(@NonNull RedisOperations<K, V> operations) throws DataAccessException {
+        operations.multi();
+        T result = callback.apply(sessionRedisTemplate, userSessionsRedisTemplate);
+        operations.exec();
+        return result;
+      }
+
+    });
   }
 
 }
