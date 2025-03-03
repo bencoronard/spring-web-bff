@@ -14,7 +14,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import dev.hireben.demo.web.bff.application.exception.ApiAccessDeniedException;
 import dev.hireben.demo.web.bff.application.exception.AuthenticationFailedException;
+import dev.hireben.demo.web.bff.application.exception.ProtectedViewAccessDeniedException;
+import dev.hireben.demo.web.bff.application.exception.ProtectedViewPermissionDeniedException;
+import dev.hireben.demo.web.bff.application.exception.PublicViewAccessDeniedException;
+import dev.hireben.demo.web.bff.application.exception.SessionExpiredException;
+import dev.hireben.demo.web.bff.application.exception.SessionNotFoundException;
 import dev.hireben.demo.web.bff.application.model.ApplicationException;
 import dev.hireben.demo.web.bff.presentation.exception.dto.FieldValidationErrorMap;
 import dev.hireben.demo.web.bff.presentation.exception.model.SeverityLevel;
@@ -39,6 +45,43 @@ public class GlobalExceptionHandler {
 
   // ---------------------------------------------------------------------------//
   // Methods
+  // ---------------------------------------------------------------------------//
+
+  @ExceptionHandler({
+      SessionNotFoundException.class,
+      SessionExpiredException.class,
+      PublicViewAccessDeniedException.class,
+      ProtectedViewAccessDeniedException.class,
+      ProtectedViewPermissionDeniedException.class,
+      ApiAccessDeniedException.class
+  })
+  public void handleRedirectableException(
+      ApplicationException exception,
+      HttpServletResponse response) throws IOException {
+
+    String toPath = switch (exception) {
+      case SessionNotFoundException _,SessionExpiredException _,ProtectedViewAccessDeniedException _,ApiAccessDeniedException _ ->
+        "/login";
+      case PublicViewAccessDeniedException _ -> "/dashboard";
+      case ProtectedViewPermissionDeniedException _ -> "/403";
+      default -> "/404";
+    };
+
+    response.sendRedirect(toPath);
+  }
+
+  // ---------------------------------------------------------------------------//
+
+  @ExceptionHandler({ ApiAccessDeniedException.class })
+  public void handleApiAccessDeniedException(
+      ApplicationException exception,
+      HttpServletResponse response) throws IOException {
+
+    response.sendError(HttpStatus.UNAUTHORIZED.value(), "");
+  }
+
+  // ---------------------------------------------------------------------------//
+
   // ---------------------------------------------------------------------------//
 
   @ExceptionHandler({ ApplicationException.class })

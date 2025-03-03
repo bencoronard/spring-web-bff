@@ -82,7 +82,7 @@ application:
       anonymous-ttl: "${APP_SESSION_TTL: 1800}"
       user-ttl: "${APP_USER_SESSION_TTL: 3600}"
       max-per-user: "${APP_MAX_ACTIVE_USER_SESSIONS:2}"
-      cleanup-interaval: "{APP_SESSION_CLEAN_UP_INTERVAL: 60000}"
+      cleanup-interval: "${APP_SESSION_CLEAN_UP_INTERVAL: 60000}"
     # login-limit: "${APP_LOGIN_ATTEMPTS_LIMIT:3}"
   # http:
   #   client:
