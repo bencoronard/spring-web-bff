@@ -8,12 +8,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
+
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Repository;
 
 import dev.hireben.demo.rest.web.bff.domain.entity.Sezzion;
@@ -150,6 +152,37 @@ public class SezzionRepositoryRedis implements SezzionRepository {
         .filter(Optional::isPresent)
         .map(Optional::get)
         .toList();
+  }
+
+  // ---------------------------------------------------------------------------//
+
+  @Scheduled(fixedRateString = "${application.auth.session.cleanup-interaval}")
+  public void cleanUpExpiredSessionIds() {
+
+    // System.out.println("Hello, world!");
+
+    Collection<String> userSessionsKeys = userSessionsRedisTemplate.keys(formatUserIdKeyFrom("*"));
+
+    if (userSessionsKeys == null || userSessionsKeys.isEmpty()) {
+      return;
+    }
+
+    for (String userSessionsKey : userSessionsKeys) {
+      Collection<String> sessionIds = userSessionsRedisTemplate.opsForSet().members(userSessionsKey);
+
+      if (sessionIds == null || sessionIds.isEmpty()) {
+        continue;
+      }
+
+      Collection<String> expiredSessionIds = sessionIds.stream()
+          .filter(sessionId -> findById(sessionId).isEmpty())
+          .toList();
+
+      if (!expiredSessionIds.isEmpty()) {
+        userSessionsRedisTemplate.opsForSet().remove(userSessionsKey,
+            expiredSessionIds.toArray());
+      }
+    }
   }
 
   // ---------------------------------------------------------------------------//

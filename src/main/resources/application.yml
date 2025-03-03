@@ -7,15 +7,15 @@ server:
   error:
     whitelabel:
       enabled: false
-  servlet:
-    session:
-      timeout: "${DEMO_SERVICE_BFF_SESSION_TIMEOUT:30m}"
-      cookie:
-        name: "JSESSIONID"
-        same-site: "LAX"
-        max-age: "-1"
-        http-only: true
-        secure: false
+  # servlet:
+  #   session:
+  #     timeout: "${DEMO_SERVICE_BFF_SESSION_TIMEOUT:30m}"
+  #     cookie:
+  #       name: "JSESSIONID"
+  #       same-site: "LAX"
+  #       max-age: "-1"
+  #       http-only: true
+  #       secure: false
 
 spring:
   application:
@@ -34,22 +34,22 @@ spring:
       username: "${DEMO_DATABASE_REDIS_USERNAME}"
       password: "${DEMO_DATABASE_REDIS_PASSWORD}"
       timeout: "2000ms"
-      cluster:
-        nodes:
-        - "127.0.0.1:6379"
-        - "127.0.0.2:6379"
-      sentinel:
-        master: "mymaster"
-        nodes:
-        - "127.0.0.1:26379"
-        - "127.0.0.2:26379"
+      # cluster:
+      #   nodes:
+      #   - "127.0.0.1:6379"
+      #   - "127.0.0.2:6379"
+      # sentinel:
+      #   master: "mymaster"
+      #   nodes:
+      #   - "127.0.0.1:26379"
+      #   - "127.0.0.2:26379"
       
 
 logging:
   level:
     root: "info"
   include-application-name: true
-  include-application-group: true
+  include-application-group: false
 
 management:
   endpoints:
@@ -77,26 +77,28 @@ info:
     service-id: "${DEMO_SERVICE_REST_WEB_BFF_ID:REST_WEB_BFF}"
 
 application:
-  http:
-    client:
-      timeout-in-sec: "${APP_HTTP_CLIENT_TIMEOUT:3}"
-      pool-size: "${APP_HTTP_CLIENT_POOL_SIZE:10}"
-      max-conn-per-route: "${APP_HTTP_CLIENT_ROUTE_SIZE:5}"
   auth:
     session:
       anonymous-ttl: "${APP_SESSION_TTL: 1800}"
       user-ttl: "${APP_USER_SESSION_TTL: 3600}"
       max-per-user: "${APP_MAX_USER_SESSIONS:2}"
-    login-limit: "${APP_LOGIN_ATTEMPTS_LIMIT:3}"
+      cleanup-interaval: "{APP_SESSION_CLEAN_UP_INTERVAL: 60000}"
+    # login-limit: "${APP_LOGIN_ATTEMPTS_LIMIT:3}"
+  # http:
+  #   client:
+  #     timeout-in-sec: "${APP_HTTP_CLIENT_TIMEOUT:3}"
+  #     pool-size: "${APP_HTTP_CLIENT_POOL_SIZE:10}"
+  #     max-conn-per-route: "${APP_HTTP_CLIENT_ROUTE_SIZE:5}"
+  
       
-registry:
-  services:
-    - serviceId: "${DEMO_SERVICE_FRONTEND_ID}"
-      baseUrl: "${DEMO_SERVICE_FRONTEND_BASE_URL}"
-      secretKey: "${DEMO_SERVICE_FRONTEND_SECRET_KEY}"
-    - serviceId: "${DEMO_SERVICE_REST_RESOURCE_ID}"
-      baseUrl: "${DEMO_SERVICE_REST_RESOURCE_BASE_URL}"
-      secretKey: "${DEMO_SERVICE_REST_RESOURCE_SECRET_KEY}"
+# registry:
+#   services:
+#     - serviceId: "${DEMO_SERVICE_FRONTEND_ID}"
+#       baseUrl: "${DEMO_SERVICE_FRONTEND_BASE_URL}"
+#       secretKey: "${DEMO_SERVICE_FRONTEND_SECRET_KEY}"
+#     - serviceId: "${DEMO_SERVICE_REST_RESOURCE_ID}"
+#       baseUrl: "${DEMO_SERVICE_REST_RESOURCE_BASE_URL}"
+#       secretKey: "${DEMO_SERVICE_REST_RESOURCE_SECRET_KEY}"
 
 ---
 # Environment: dev
