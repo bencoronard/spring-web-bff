@@ -1,9 +1,9 @@
 server:
   port: "${APP_SERVER_PORT:8080}"
-  secret-key: "${DEMO_SERVICE_BFF_SECRET_KEY:hireBenDemoSecretKey}"
-  key-pair:
-    public: "${DEMO_SERVICE_BFF_PUBLIC_KEY}"
-    private: "${DEMO_SERVICE_BFF_PRIVATE_KEY}"
+  secret-key: "${DEMO_SERVICE_REST_WEB_BFF_SECRET_KEY:hireBenDemoSecretKey}"
+  # key-pair:
+  #   public: "${DEMO_SERVICE_BFF_PUBLIC_KEY}"
+  #   private: "${DEMO_SERVICE_BFF_PRIVATE_KEY}"
   error:
     whitelabel:
       enabled: false
@@ -29,8 +29,8 @@ spring:
     redis:
       repositories:
         enabled: false
-      host: "${DEMO_DATABASE_REDIS_HOST}"
-      port: "${DEMO_DATABASE_REDIS_PORT}"
+      host: "${DEMO_DATABASE_REDIS_HOST:localhost}"
+      port: "${DEMO_DATABASE_REDIS_PORT:6379}"
       username: "${DEMO_DATABASE_REDIS_USERNAME}"
       password: "${DEMO_DATABASE_REDIS_PASSWORD}"
       timeout: "2000ms"
@@ -81,7 +81,7 @@ application:
     session:
       anonymous-ttl: "${APP_SESSION_TTL: 1800}"
       user-ttl: "${APP_USER_SESSION_TTL: 3600}"
-      max-per-user: "${APP_MAX_USER_SESSIONS:2}"
+      max-per-user: "${APP_MAX_ACTIVE_USER_SESSIONS:2}"
       cleanup-interaval: "{APP_SESSION_CLEAN_UP_INTERVAL: 60000}"
     # login-limit: "${APP_LOGIN_ATTEMPTS_LIMIT:3}"
   # http:
