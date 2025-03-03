@@ -159,8 +159,6 @@ public class SezzionRepositoryRedis implements SezzionRepository {
   @Scheduled(fixedRateString = "${application.auth.session.cleanup-interval}")
   public void cleanUpExpiredSessionIds() {
 
-    System.out.println("Hello, world!");
-
     Collection<String> userSessionsKeys = userSessionsRedisTemplate.keys(formatUserIdKeyFrom("*"));
 
     if (userSessionsKeys == null || userSessionsKeys.isEmpty()) {
@@ -183,6 +181,8 @@ public class SezzionRepositoryRedis implements SezzionRepository {
             expiredSessionIds.toArray());
       }
     }
+
+    System.out.println("Hello, world!");
   }
 
   // ---------------------------------------------------------------------------//

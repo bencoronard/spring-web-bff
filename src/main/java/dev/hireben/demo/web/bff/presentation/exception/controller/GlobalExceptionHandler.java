@@ -72,14 +72,6 @@ public class GlobalExceptionHandler {
 
   // ---------------------------------------------------------------------------//
 
-  @ExceptionHandler({ ApiAccessDeniedException.class })
-  public void handleApiAccessDeniedException(
-      ApplicationException exception,
-      HttpServletResponse response) throws IOException {
-
-    response.sendError(HttpStatus.UNAUTHORIZED.value(), "");
-  }
-
   // ---------------------------------------------------------------------------//
 
   // ---------------------------------------------------------------------------//
