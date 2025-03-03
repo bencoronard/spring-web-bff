@@ -181,8 +181,6 @@ public class SezzionRepositoryRedis implements SezzionRepository {
             expiredSessionIds.toArray());
       }
     }
-
-    System.out.println("Hello, world!");
   }
 
   // ---------------------------------------------------------------------------//

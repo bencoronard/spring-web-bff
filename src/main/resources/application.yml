@@ -49,7 +49,7 @@ logging:
   level:
     root: "info"
   include-application-name: true
-  include-application-group: false
+  include-application-group: true
 
 management:
   endpoints:
