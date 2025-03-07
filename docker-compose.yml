@@ -24,7 +24,7 @@ services:
       APP_SESSION_CLEAN_UP_INTERVAL: 30000
 
   redis:
-    image: redis:latest
+    image: redis:alpine
     ports:
       - 6379:6379
     networks:
